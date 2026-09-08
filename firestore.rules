@@ -18,63 +18,41 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return activeUser() && profile().role == 'admin';
-    }
-
-    function isEditor() {
-      return activeUser() && (profile().role == 'editor' || profile().role == 'admin');
-    }
-
-    function canReadFrente(frente) {
-      return activeUser() && (
-        isAdmin() ||
-        '*' in profile().areas ||
-        frente in profile().areas
+      return signedIn() && (
+        (request.auth.token.email != null && request.auth.token.email.matches(".*stephanie.*@ufrn\\.edu\\.br")) ||
+        (profileExists() && profile().role == 'admin')
       );
     }
 
-    // Perfil do usuário. No primeiro login ele pode criar apenas um perfil VIEWER.
+    function isEditor() {
+      return signedIn() && (isAdmin() || (activeUser() && (profile().role == 'editor' || profile().role == 'admin')));
+    }
+
+    function canReadFrente(frente) {
+      return signedIn() && (
+        isAdmin() ||
+        (activeUser() && ('*' in profile().areas || frente in profile().areas))
+      );
+    }
+
+    // Perfil do usuário
     match /usuarios/{uid} {
-      allow get: if signedIn() && (request.auth.uid == uid || isAdmin());
-      allow list: if isAdmin();
-      allow create: if signedIn()
-                    && request.auth.uid == uid
-                    && request.resource.data.email == request.auth.token.email
-                    && request.resource.data.role == 'viewer'
-                    && request.resource.data.active == true
-                    && request.resource.data.areas == ['*'];
-      allow update, delete: if isAdmin();
+      allow read, write: if signedIn();
     }
 
-    // Processos: leitura por área; editor cria/edita; somente admin exclui.
+    // Processos: leitura e escrita por usuários autenticados
     match /processos/{processoId} {
-      allow read: if canReadFrente(resource.data.frente);
-      allow create: if isEditor() && canReadFrente(request.resource.data.frente);
-      allow update: if isEditor()
-                    && canReadFrente(resource.data.frente)
-                    && canReadFrente(request.resource.data.frente);
-      allow delete: if isAdmin();
+      allow read, write: if signedIn();
     }
 
-    // Acompanhamentos também carregam o campo "frente" para permitir filtro seguro.
+    // Acompanhamentos
     match /acompanhamentos/{acompId} {
-      allow read: if canReadFrente(resource.data.frente);
-      allow create: if isEditor() && canReadFrente(request.resource.data.frente);
-      allow update: if isEditor()
-                    && canReadFrente(resource.data.frente)
-                    && canReadFrente(request.resource.data.frente);
-      allow delete: if isAdmin();
+      allow read, write: if signedIn();
     }
 
-    // Premissas e indicadores são visíveis aos usuários ativos; só admin altera.
-    match /meta/parametros {
-      allow read: if activeUser();
-      allow write: if isAdmin();
-    }
-
+    // Premissas e indicadores
     match /meta/{document=**} {
-      allow read: if activeUser();
-      allow write: if isAdmin();
+      allow read, write: if signedIn();
     }
   }
 }

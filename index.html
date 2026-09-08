@@ -1179,6 +1179,7 @@
     <select id="f-frente"><option value="">Todas as frentes</option></select>
     <select id="f-setor"><option value="">Todos os setores</option></select>
     <select id="f-status"><option value="">Todos os status</option></select>
+    <select id="f-autor"><option value="">Todos os autores (e-mails)</option></select>
     <input type="text" id="f-search" placeholder="Buscar processo ou responsável…">
     <span class="spacer"></span>
     <button class="btn btn-ghost btn-sm" id="f-clear">Limpar filtros</button>
@@ -1761,6 +1762,7 @@ function defaultUserPermissions(){
   return [
     { email: "stephanierodrigues.090@ufrn.edu.br", role: "admin", areas: ["*"] },
     { email: "stephanie.rodrigues.090@ufrn.edu.br", role: "admin", areas: ["*"] },
+    { email: "jennefer.lima.125@ufrn.edu.br", role: "editor", areas: ["*"] },
     { email: "manufatura@gertec.com.br", role: "editor", areas: ["Manufatura"] },
     { email: "engenharia@gertec.com.br", role: "editor", areas: ["Engenharia"] },
     { email: "rh@gertec.com.br", role: "editor", areas: ["Recursos Humanos"] }
@@ -1790,6 +1792,10 @@ function setLiveStatus(on){
   const container = document.getElementById("live-indicator-container");
   if(dot) dot.classList.toggle("off", !on);
   if(container) container.title = on ? "Conectado em tempo real" : "Modo local / offline";
+}
+
+function getUserDocId(email){
+  return (email || "").toLowerCase().trim().replace(/[^a-z0-9]/g, "_");
 }
 
 function getUserPermission(email){
@@ -1833,7 +1839,7 @@ function registerUserLogin(user){
   saveLocalData();
   if(fbDb && fbAuth?.currentUser && setDoc && doc){
     try {
-      const docId = emailLower.replace(/[^a-z0-9]/g, "_");
+      const docId = getUserDocId(user.email);
       setDoc(doc(fbDb, "usuarios", docId), existing, { merge: true });
     } catch(e){}
   }
@@ -1854,7 +1860,6 @@ function updateAuthUI(user){
   const openLoginBtn = document.getElementById("btn-open-login");
   const userInfoBadge = document.getElementById("user-info-badge");
   const userEmailDisplay = document.getElementById("user-email-display");
-  const adminBtn = document.getElementById("btn-admin-modal");
 
   const isLoggedIn = isUserLoggedIn();
   const isGuest = Boolean(state.guestMode);
@@ -1884,7 +1889,15 @@ function updateAuthUI(user){
 
   const perm = getUserPermission(user?.email);
   const isAdmin = Boolean(isLoggedIn && perm.role === "admin");
+  const canEdit = Boolean(isLoggedIn && (perm.role === "admin" || perm.role === "editor"));
+
+  const adminBtn = document.getElementById("btn-admin-modal");
+  const paramsBtn = document.getElementById("btn-params");
+  const addBtn = document.getElementById("btn-add");
+
   if(adminBtn) adminBtn.hidden = !isAdmin;
+  if(paramsBtn) paramsBtn.hidden = !isAdmin;
+  if(addBtn) addBtn.hidden = !canEdit;
   
   render();
 }
@@ -1900,6 +1913,12 @@ async function initData(){
   }
   if(!Array.isArray(state.userPermissions) || !state.userPermissions.length){
     state.userPermissions = defaultUserPermissions();
+  } else {
+    const defaults = defaultUserPermissions();
+    defaults.forEach(def => {
+      const exists = state.userPermissions.some(u => (u.email||"").toLowerCase().trim() === def.email.toLowerCase().trim());
+      if(!exists) state.userPermissions.push(def);
+    });
   }
 
   if(localProcs) {
@@ -1953,7 +1972,19 @@ function subscribeFirestoreData(){
 
   onSnapshot(collection(fbDb, "usuarios"), (snap) => {
     if(!snap.empty) {
-      state.userPermissions = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+      const incoming = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+      const permsMap = new Map();
+      (state.userPermissions || []).forEach(u => {
+        if(u && u.email) permsMap.set(u.email.toLowerCase().trim(), u);
+      });
+      incoming.forEach(u => {
+        if(u && u.email) {
+          const key = u.email.toLowerCase().trim();
+          const prev = permsMap.get(key) || {};
+          permsMap.set(key, { ...prev, ...u });
+        }
+      });
+      state.userPermissions = Array.from(permsMap.values());
       saveLocalData();
       renderAdminUsersTable();
       render();
@@ -1962,6 +1993,12 @@ function subscribeFirestoreData(){
 }
 
 async function saveProcesso(p){
+  const activeUserEmail = state.user?.email || "stephanierodrigues.090@ufrn.edu.br";
+  const activeUserName = state.user?.displayName || activeUserEmail;
+  p.createdBy = p.createdBy || activeUserEmail;
+  p.createdByDisplayName = p.createdByDisplayName || activeUserName;
+  p.createdAt = p.createdAt || new Date().toLocaleString("pt-BR");
+
   if(fbDb && fbAuth?.currentUser && addDoc && collection){
     try{ 
       const docRef = await addDoc(collection(fbDb, "processos"), p);
@@ -1979,7 +2016,14 @@ async function saveProcesso(p){
 
 async function updateProcesso(id, data){
   const existing = state.processos.find(p=>p.id===id);
-  const body = { ...data, isSeed: existing ? !!existing.isSeed : false };
+  const activeUserEmail = state.user?.email || "stephanierodrigues.090@ufrn.edu.br";
+  const body = { 
+    ...data, 
+    isSeed: existing ? !!existing.isSeed : false,
+    createdBy: existing?.createdBy || activeUserEmail,
+    updatedBy: activeUserEmail,
+    updatedAt: new Date().toLocaleString("pt-BR")
+  };
   if(fbDb && fbAuth?.currentUser && setDoc && doc && !id.startsWith("local-")){
     try{ 
       await setDoc(doc(fbDb, "processos", id), body, { merge:true }); 
@@ -2008,6 +2052,12 @@ async function deleteProcesso(id){
 }
 
 async function saveTracking(row){
+  const activeUserEmail = state.user?.email || "stephanierodrigues.090@ufrn.edu.br";
+  const activeUserName = state.user?.displayName || activeUserEmail;
+  row.createdBy = row.createdBy || activeUserEmail;
+  row.createdByDisplayName = row.createdByDisplayName || activeUserName;
+  row.createdAt = row.createdAt || new Date().toLocaleString("pt-BR");
+
   if(fbDb && fbAuth?.currentUser && addDoc && collection){
     try{ 
       const docRef = await addDoc(collection(fbDb, "acompanhamentos"), row); 
@@ -2048,9 +2098,15 @@ function filteredProcessos(){
     if(f.frente && p.frente!==f.frente) return false;
     if(f.setor && p.setor!==f.setor) return false;
     if(f.status && p.status!==f.status) return false;
+    if(f.author){
+      const aLower = f.author.toLowerCase().trim();
+      const isProcAuthor = (p.createdBy||"").toLowerCase().trim() === aLower;
+      const isTrackAuthor = state.acomp.some(t => t.processoId === p.id && (t.createdBy||"").toLowerCase().trim() === aLower);
+      if(!isProcAuthor && !isTrackAuthor) return false;
+    }
     if(f.search){
       const s = f.search.toLowerCase();
-      if(!(p.nome.toLowerCase().includes(s) || (p.responsavel||"").toLowerCase().includes(s))) return false;
+      if(!(p.nome.toLowerCase().includes(s) || (p.responsavel||"").toLowerCase().includes(s) || (p.createdBy||"").toLowerCase().includes(s))) return false;
     }
     return true;
   });
@@ -2500,6 +2556,7 @@ function renderProcCards(list){
             <span class="chip" style="background:${frenteHex(p.frente)}22;color:${frenteHex(p.frente)}"><span class="chip-dot" style="background:currentColor"></span>${p.frente}</span>
             <span class="chip chip-muted">${(p.setor||'').replace(/^.*? - /,"")}</span>
             <span class="chip ${statusChipClass(p.status)}">${p.status}</span>
+            <span class="chip chip-muted" title="Processo criado por: ${p.createdBy||'Sistema'}">👤 ${(p.createdBy||'Sistema').split('@')[0]}</span>
           </div>
         </div>
         ${canEdit ? `<div class="proc-icon-actions">
@@ -2536,13 +2593,14 @@ function renderProcCards(list){
           <span class="legend-item"><span class="legend-swatch" style="background:var(--accent)"></span>TO-BE (Novo)</span>
         </div>
         <table class="track-table">
-          <thead><tr><th>Mês</th><th>Horas Real.</th><th>Econ. Prevista</th><th>Econ. Realizada</th><th>Ating.</th></tr></thead>
+          <thead><tr><th>Mês</th><th>Horas Real.</th><th>Econ. Prevista</th><th>Econ. Realizada</th><th>Ating.</th><th>Autor</th></tr></thead>
           <tbody>
           ${tracks.length? tracks.map(t=>{
             const tc = computeTracking(t, p);
             const atingCls = tc.pctAtingimento>=1 ? "good" : (tc.pctAtingimento>=0.85?"warning":"critical");
-            return `<tr><td>${t.mes.slice(0,3)}/${t.ano}</td><td>${fmtNum.format(tc.horasReal)}h</td><td>${fmtCompactBRL(tc.econFinPrevista)}</td><td>${fmtCompactBRL(tc.econFinRealizada)}</td><td style="color:var(--${atingCls})">${(tc.pctAtingimento*100).toFixed(0)}%</td></tr>`;
-          }).join("") : `<tr><td colspan="5" style="color:var(--ink-muted);font-family:'IBM Plex Sans',sans-serif">Sem acompanhamento mensal ainda.</td></tr>`}
+            const trackAuthor = t.createdBy ? t.createdBy.split('@')[0] : 'Sistema';
+            return `<tr><td>${t.mes.slice(0,3)}/${t.ano}</td><td>${fmtNum.format(tc.horasReal)}h</td><td>${fmtCompactBRL(tc.econFinPrevista)}</td><td>${fmtCompactBRL(tc.econFinRealizada)}</td><td style="color:var(--${atingCls})">${(tc.pctAtingimento*100).toFixed(0)}%</td><td title="${t.createdBy||'Sistema'}" style="font-size:12px;color:var(--ink-secondary)">👤 ${trackAuthor}</td></tr>`;
+          }).join("") : `<tr><td colspan="6" style="color:var(--ink-muted);font-family:'IBM Plex Sans',sans-serif">Sem acompanhamento mensal ainda.</td></tr>`}
           </tbody>
         </table>
       </div>
@@ -2609,6 +2667,22 @@ function refreshFilterSetorOptions(){
   sSel.innerHTML = `<option value="">Todos os setores</option>` + opts.map(s=>`<option value="${s}">${s.replace(/^.*? - /,"")}</option>`).join("");
   if(opts.includes(keep)) sSel.value = keep; else { sSel.value=""; state.filters.setor=""; }
 }
+function refreshFilterAuthorOptions(){
+  const autorSel = document.getElementById("f-autor");
+  if(!autorSel) return;
+
+  const currentVal = state.filters.author || "";
+  const emailsSet = new Set();
+
+  (state.processos||[]).forEach(p => { if(p.createdBy) emailsSet.add(p.createdBy.toLowerCase().trim()); });
+  (state.acomp||[]).forEach(t => { if(t.createdBy) emailsSet.add(t.createdBy.toLowerCase().trim()); });
+  (state.userPermissions||[]).forEach(u => { if(u.email) emailsSet.add(u.email.toLowerCase().trim()); });
+
+  const sortedEmails = Array.from(emailsSet).sort();
+
+  autorSel.innerHTML = `<option value="">Todos os autores (e-mails)</option>` + 
+    sortedEmails.map(e => `<option value="${e}" ${e === currentVal.toLowerCase().trim() ? 'selected' : ''}>👤 ${e}</option>`).join("");
+}
 function refreshFilterOptions(){
   const fSel = document.getElementById("f-frente");
   const stSel = document.getElementById("f-status");
@@ -2619,12 +2693,14 @@ function refreshFilterOptions(){
   stSel.innerHTML = `<option value="">Todos os status</option>` + STATUS_INICIATIVA.map(s=>`<option value="${s}">${s}</option>`).join("");
   stSel.value = STATUS_INICIATIVA.includes(keepSt) ? keepSt : "";
   refreshFilterSetorOptions();
+  refreshFilterAuthorOptions();
 }
 function populateFilterSelects(){
   refreshFilterOptions();
   const fSel = document.getElementById("f-frente");
   const sSel = document.getElementById("f-setor");
   const stSel = document.getElementById("f-status");
+  const autorSel = document.getElementById("f-autor");
   const searchInput = document.getElementById("f-search");
   const clearBtn = document.getElementById("f-clear");
   const sortSel = document.getElementById("proc-sort");
@@ -2637,13 +2713,15 @@ function populateFilterSelects(){
   });
   if(sSel) sSel.addEventListener("change",()=>{ state.filters.setor=sSel.value; render(); });
   if(stSel) stSel.addEventListener("change",()=>{ state.filters.status=stSel.value; render(); });
+  if(autorSel) autorSel.addEventListener("change",()=>{ state.filters.author=autorSel.value; render(); });
   if(searchInput) searchInput.addEventListener("input",(e)=>{ state.filters.search=e.target.value; render(); });
   if(clearBtn) clearBtn.addEventListener("click",()=>{
-    state.filters={frente:"",setor:"",status:"",search:""};
+    state.filters={frente:"",setor:"",status:"",author:"",search:""};
     if(fSel) fSel.value=""; 
     refreshFilterSetorOptions(); 
     if(sSel) sSel.value=""; 
     if(stSel) stSel.value=""; 
+    if(autorSel) autorSel.value="";
     if(searchInput) searchInput.value="";
     render();
   });
@@ -2901,21 +2979,45 @@ function renderAdminUsersTable(){
     const areasLabel = u.areas && u.areas.includes("*") ? "Todas as Frentes (*)" : (u.areas||[]).join(", ");
     const lastLoginText = u.lastLogin ? `<span style="font-size:11px;color:var(--ink-muted);display:block;margin-top:2px">📅 Último login: ${u.lastLogin}</span>` : `<span style="font-size:11px;color:var(--ink-muted);display:block;margin-top:2px">✉️ Cadastrado manualmente</span>`;
 
+    const emailLower = (u.email||"").toLowerCase().trim();
+    const procCount = state.processos.filter(p => (p.createdBy||"").toLowerCase().trim() === emailLower).length;
+    const trackCount = state.acomp.filter(t => (t.createdBy||"").toLowerCase().trim() === emailLower).length;
+    const totalCount = procCount + trackCount;
+
+    const statsBadge = totalCount > 0 
+      ? `<span style="font-size:11px;color:var(--accent);display:block;margin-top:2px;font-weight:600">📊 ${procCount} proc. / ${trackCount} mensuração(ões)</span>`
+      : `<span style="font-size:11px;color:var(--ink-muted);display:block;margin-top:2px">📊 Nenhuma mensuração/processo ainda</span>`;
+
     return `<tr>
       <td style="font-weight:600">
         <div>${u.email}</div>
+        ${statsBadge}
         ${lastLoginText}
       </td>
       <td>${roleSelect}</td>
       <td style="font-size:13px">${areasLabel}</td>
       <td>
-        <div style="display:flex;gap:6px">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm adm-filter-author" data-email="${u.email}" title="Ver registros deste usuário no painel">🔍 Ver Adições</button>
           <button class="btn btn-ghost btn-sm adm-edit-user" data-idx="${idx}" title="Editar frentes visíveis">✏️ Frentes</button>
           <button class="btn btn-danger btn-sm adm-del-user" data-idx="${idx}" title="Remover usuário">Excluir</button>
         </div>
       </td>
     </tr>`;
   }).join("");
+
+  // Filtrar no painel por autor selecionado na tabela
+  tbody.querySelectorAll(".adm-filter-author").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const email = btn.dataset.email;
+      state.filters.author = email;
+      const autorSel = document.getElementById("f-autor");
+      if(autorSel) autorSel.value = email;
+      closeAdminModal();
+      render();
+      showToast(`Exibindo cadastros e mensurações de ${email}`);
+    });
+  });
 
   // Evento de alteração direta do perfil/função no seletor da tabela
   tbody.querySelectorAll(".adm-role-select").forEach(sel => {
@@ -2973,6 +3075,12 @@ function renderAdminUsersTable(){
       if(confirm(`Deseja remover o registro de permissão de ${u.email}?`)){
         state.userPermissions.splice(idx, 1);
         saveLocalData();
+        if(fbDb && deleteDoc && doc){
+          try {
+            const docId = (u.email||"").toLowerCase().trim().replace(/[^a-z0-9]/g, "_");
+            deleteDoc(doc(fbDb, "usuarios", docId));
+          } catch(e){}
+        }
         renderAdminUsersTable();
         showToast("Registro removido com sucesso!");
         render();
@@ -3068,7 +3176,8 @@ function wireAdminModal(){
 
       if(fbDb && fbAuth?.currentUser && setDoc && doc){
         try {
-          await setDoc(doc(fbDb, "usuarios", email.replace(/\./g, "_")), userData, { merge:true });
+          const docId = email.toLowerCase().trim().replace(/[^a-z0-9]/g, "_");
+          await setDoc(doc(fbDb, "usuarios", docId), userData, { merge:true });
         } catch(e){}
       }
 
