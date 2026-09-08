@@ -1263,22 +1263,22 @@
 
       <!-- Seção 1: Permissões de Usuários por E-mail -->
       <div id="adm-sec-users">
-        <p class="section-note" style="margin-top:0;margin-bottom:16px">
-          Gerencie quem pode acessar o sistema e quais frentes de atuação cada usuário cadastrado por e-mail tem permissão de visualizar e alterar.
-        </p>
+        <div style="background:var(--accent-wash);border:1px solid var(--accent-wash-strong);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--ink)">
+          <strong>💡 Registro Automático:</strong> Todos os e-mails que fizerem login no painel (via Google/Gmail ou E-mail) aparecem <strong>automaticamente</strong> na lista abaixo. Altere o perfil (<strong>Leitor</strong>, <strong>Editor</strong> ou <strong>Administrador</strong>) diretamente na tabela sem precisar digitar novamente.
+        </div>
 
         <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px">
-          <h3 style="font-size:14px;margin-bottom:12px">Adicionar / Editar Permissão</h3>
+          <h3 style="font-size:14px;margin-bottom:12px">Pré-cadastrar ou Personalizar Frentes de Usuário</h3>
           <div class="form-grid cols-3" style="gap:12px">
             <div class="field" style="grid-column: span 2">
               <label>E-mail do Usuário*</label>
-              <input type="email" id="adm-user-email" placeholder="exemplo@gertec.com.br">
+              <input type="email" id="adm-user-email" placeholder="usuario@gmail.com ou usuario@ufrn.br">
             </div>
             <div class="field">
               <label>Função (Perfil)*</label>
               <select id="adm-user-role">
                 <option value="viewer">Leitor (Apenas Visualização)</option>
-                <option value="editor">Editor (Cria e Edita)</option>
+                <option value="editor" selected>Editor (Cria e Edita)</option>
                 <option value="admin">Administrador (Acesso Total)</option>
               </select>
             </div>
@@ -1295,12 +1295,15 @@
           </div>
         </div>
 
-        <h3 style="font-size:14px;margin-bottom:10px">Usuários Cadastrados &amp; Permissões</h3>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <h3 style="font-size:14px;margin:0">Usuários Registrados &amp; Níveis de Acesso</h3>
+          <input type="text" id="adm-user-search" placeholder="🔍 Buscar e-mail registrado..." style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:12px;width:240px">
+        </div>
         <table class="track-table" id="adm-users-table">
           <thead>
             <tr>
-              <th>E-mail</th>
-              <th>Função</th>
+              <th>E-mail do Usuário</th>
+              <th>Função (Edição Rápida)</th>
               <th>Frentes Visíveis</th>
               <th>Ações</th>
             </tr>
@@ -1804,9 +1807,42 @@ function getUserPermission(email){
   return found || { role: "editor", areas: ["*"] };
 }
 
+function registerUserLogin(user){
+  if(!user || !user.email) return;
+  const emailLower = user.email.toLowerCase().trim();
+  const nowStr = new Date().toLocaleString("pt-BR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
+
+  if(!Array.isArray(state.userPermissions)) state.userPermissions = [];
+  let existing = state.userPermissions.find(u => (u.email||"").toLowerCase().trim() === emailLower);
+
+  if(existing){
+    existing.lastLogin = nowStr;
+    if(user.displayName && !existing.displayName) existing.displayName = user.displayName;
+  } else {
+    const isAdminEmail = emailLower.includes("stephanie") && emailLower.endsWith("@ufrn.edu.br");
+    existing = {
+      email: user.email.trim(),
+      displayName: user.displayName || user.email.split("@")[0],
+      role: isAdminEmail ? "admin" : "editor",
+      areas: ["*"],
+      lastLogin: nowStr
+    };
+    state.userPermissions.push(existing);
+  }
+
+  saveLocalData();
+  if(fbDb && fbAuth?.currentUser && setDoc && doc){
+    try {
+      const docId = emailLower.replace(/[^a-z0-9]/g, "_");
+      setDoc(doc(fbDb, "usuarios", docId), existing, { merge: true });
+    } catch(e){}
+  }
+}
+
 function updateAuthUI(user){
   state.user = user;
   if(user && user.email){
+    registerUserLogin(user);
     try { localStorage.setItem("gertec_saved_user", JSON.stringify(user)); } catch(e){}
     state.guestMode = false;
   } else {
@@ -2840,27 +2876,107 @@ function renderAdminUsersTable(){
   const tbody = document.getElementById("adm-users-tbody");
   if(!tbody) return;
 
-  tbody.innerHTML = state.userPermissions.map((u, idx) => {
-    const roleLabel = u.role === "admin" ? "Admin" : u.role === "editor" ? "Editor" : "Leitor";
+  const searchInput = document.getElementById("adm-user-search");
+  const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
+
+  const list = state.userPermissions.filter(u => {
+    if(!query) return true;
+    return (u.email||"").toLowerCase().includes(query) || (u.displayName||"").toLowerCase().includes(query);
+  });
+
+  if(!list.length){
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--ink-muted);padding:16px">Nenhum usuário registrado ${query ? 'encontrado para essa busca' : 'ainda'}.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map((u) => {
+    const idx = state.userPermissions.indexOf(u);
+    const roleSelect = `
+      <select class="adm-role-select" data-idx="${idx}" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-weight:600;font-size:13px;cursor:pointer">
+        <option value="viewer" ${u.role === 'viewer' ? 'selected' : ''}>👁️ Leitor (Apenas Visualização)</option>
+        <option value="editor" ${u.role === 'editor' ? 'selected' : ''}>✏️ Editor (Cria &amp; Edita)</option>
+        <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>🛡️ Administrador (Acesso Total)</option>
+      </select>
+    `;
     const areasLabel = u.areas && u.areas.includes("*") ? "Todas as Frentes (*)" : (u.areas||[]).join(", ");
+    const lastLoginText = u.lastLogin ? `<span style="font-size:11px;color:var(--ink-muted);display:block;margin-top:2px">📅 Último login: ${u.lastLogin}</span>` : `<span style="font-size:11px;color:var(--ink-muted);display:block;margin-top:2px">✉️ Cadastrado manualmente</span>`;
+
     return `<tr>
-      <td style="font-weight:600">${u.email}</td>
-      <td>${roleLabel}</td>
-      <td>${areasLabel}</td>
+      <td style="font-weight:600">
+        <div>${u.email}</div>
+        ${lastLoginText}
+      </td>
+      <td>${roleSelect}</td>
+      <td style="font-size:13px">${areasLabel}</td>
       <td>
-        <button class="btn btn-danger btn-sm adm-del-user" data-idx="${idx}">Excluir</button>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-ghost btn-sm adm-edit-user" data-idx="${idx}" title="Editar frentes visíveis">✏️ Frentes</button>
+          <button class="btn btn-danger btn-sm adm-del-user" data-idx="${idx}" title="Remover usuário">Excluir</button>
+        </div>
       </td>
     </tr>`;
   }).join("");
 
+  // Evento de alteração direta do perfil/função no seletor da tabela
+  tbody.querySelectorAll(".adm-role-select").forEach(sel => {
+    sel.addEventListener("change", () => {
+      const idx = +sel.dataset.idx;
+      const newRole = sel.value;
+      const userObj = state.userPermissions[idx];
+      if(!userObj) return;
+
+      userObj.role = newRole;
+      saveLocalData();
+
+      if(fbDb && fbAuth?.currentUser && setDoc && doc){
+        try {
+          const docId = (userObj.email||"").toLowerCase().replace(/[^a-z0-9]/g, "_");
+          setDoc(doc(fbDb, "usuarios", docId), userObj, { merge: true });
+        } catch(err){}
+      }
+
+      const roleText = newRole === "admin" ? "Administrador" : newRole === "editor" ? "Editor" : "Leitor";
+      showToast(`Permissão de ${userObj.email} alterada para ${roleText}!`);
+      render();
+    });
+  });
+
+  // Preencher formulário ao clicar em Editar Frentes
+  tbody.querySelectorAll(".adm-edit-user").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = +btn.dataset.idx;
+      const u = state.userPermissions[idx];
+      if(!u) return;
+
+      const emailInput = document.getElementById("adm-user-email");
+      const roleSelect = document.getElementById("adm-user-role");
+      const frentesSelect = document.getElementById("adm-user-frentes");
+
+      if(emailInput) emailInput.value = u.email;
+      if(roleSelect) roleSelect.value = u.role || "viewer";
+      if(frentesSelect){
+        Array.from(frentesSelect.options).forEach(opt => {
+          opt.selected = (u.areas || []).includes(opt.value);
+        });
+      }
+      showToast(`Dados de ${u.email} carregados no formulário.`);
+    });
+  });
+
+  // Excluir permissão
   tbody.querySelectorAll(".adm-del-user").forEach(btn => {
     btn.addEventListener("click", () => {
       const idx = +btn.dataset.idx;
-      state.userPermissions.splice(idx, 1);
-      saveLocalData();
-      renderAdminUsersTable();
-      showToast("Permissão de usuário removida!");
-      render();
+      const u = state.userPermissions[idx];
+      if(!u) return;
+
+      if(confirm(`Deseja remover o registro de permissão de ${u.email}?`)){
+        state.userPermissions.splice(idx, 1);
+        saveLocalData();
+        renderAdminUsersTable();
+        showToast("Registro removido com sucesso!");
+        render();
+      }
     });
   });
 }
@@ -2882,6 +2998,11 @@ function wireAdminModal(){
   const secUsers = document.getElementById("adm-sec-users");
   const secParams = document.getElementById("adm-sec-params");
   const saveUserBtn = document.getElementById("adm-save-user-btn");
+  const userSearch = document.getElementById("adm-user-search");
+
+  if(userSearch){
+    userSearch.addEventListener("input", renderAdminUsersTable);
+  }
 
   function openAdminModal(){
     renderAdminFrentesOptions();
@@ -2940,7 +3061,7 @@ function wireAdminModal(){
       const userData = { email, role, areas: selectedAreas.length ? selectedAreas : ["*"] };
 
       if(existingIdx >= 0){
-        state.userPermissions[existingIdx] = userData;
+        state.userPermissions[existingIdx] = { ...state.userPermissions[existingIdx], ...userData };
       } else {
         state.userPermissions.push(userData);
       }
