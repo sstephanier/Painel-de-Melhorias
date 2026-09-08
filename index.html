@@ -1,0 +1,3330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel de Melhorias Gertec</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap">
+  <style>
+  :root {
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --surface-2: #f8fafc;
+    --surface-hover: #f1f5f9;
+    --ink: #0f172a;
+    --ink-secondary: #475569;
+    --ink-muted: #64748b;
+    --border: rgba(148, 163, 184, 0.22);
+    --border-strong: rgba(148, 163, 184, 0.45);
+    
+    --accent: #6366f1;
+    --accent-hover: #4f46e5;
+    --accent-fg: #ffffff;
+    --accent-wash: #eeeffe;
+    --accent-wash-strong: #e0e2fe;
+    
+    --good: #10b981;
+    --warning: #f59e0b;
+    --serious: #f97316;
+    --critical: #ef4444;
+    
+    --good-wash: #ecfdf5;
+    --warning-wash: #fffbe6;
+    --critical-wash: #fef2f2;
+    
+    --series-1: #3b82f6;
+    --series-2: #f97316;
+    --series-3: #10b981;
+    --series-1-wash: #eff6ff;
+    --series-2-wash: #fff7ed;
+    --series-3-wash: #ecfdf5;
+    
+    --grid: #e2e8f0;
+    --shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+    --shadow-lg: 0 16px 32px -8px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+    --radius: 16px;
+    --radius-sm: 10px;
+    color-scheme: light;
+  }
+
+  [data-theme="dark"] {
+    --bg: #0b0f17;
+    --surface: #131b26;
+    --surface-2: #1c2635;
+    --surface-hover: #243144;
+    --ink: #f8fafc;
+    --ink-secondary: #94a3b8;
+    --ink-muted: #64748b;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.18);
+    
+    --accent: #818cf8;
+    --accent-hover: #6366f1;
+    --accent-fg: #0f172a;
+    --accent-wash: #1e1b4b;
+    --accent-wash-strong: #312e81;
+    
+    --good: #34d399;
+    --warning: #fbbf24;
+    --serious: #fb923c;
+    --critical: #f87171;
+    
+    --good-wash: #064e3b;
+    --warning-wash: #451a03;
+    --critical-wash: #450a0a;
+    
+    --series-1: #60a5fa;
+    --series-2: #fb923c;
+    --series-3: #34d399;
+    --series-1-wash: #172554;
+    --series-2-wash: #431407;
+    --series-3-wash: #052e16;
+    
+    --grid: #1e293b;
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.6);
+    color-scheme: dark;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0b0f17;
+      --surface: #131b26;
+      --surface-2: #1c2635;
+      --surface-hover: #243144;
+      --ink: #f8fafc;
+      --ink-secondary: #94a3b8;
+      --ink-muted: #64748b;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.18);
+      
+      --accent: #818cf8;
+      --accent-hover: #6366f1;
+      --accent-fg: #0f172a;
+      --accent-wash: #1e1b4b;
+      --accent-wash-strong: #312e81;
+      
+      --good: #34d399;
+      --warning: #fbbf24;
+      --serious: #fb923c;
+      --critical: #f87171;
+      
+      --good-wash: #064e3b;
+      --warning-wash: #451a03;
+      --critical-wash: #450a0a;
+      
+      --series-1: #60a5fa;
+      --series-2: #fb923c;
+      --series-3: #34d399;
+      --series-1-wash: #172554;
+      --series-2-wash: #431407;
+      --series-3-wash: #052e16;
+      
+      --grid: #1e293b;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.6);
+      color-scheme: dark;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  h1, h2, h3, .brand-h1 {
+    font-family: "Outfit", system-ui, sans-serif;
+    text-wrap: balance;
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+
+  .mono {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  button, input, select, textarea {
+    font-family: inherit;
+    color: inherit;
+  }
+
+  ::selection { background: var(--accent-wash-strong); }
+  a { color: var(--accent); text-decoration: none; }
+  
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  /* ===== Layout Shell ===== */
+  #app {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 32px 80px;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 8px 0 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-right: auto;
+  }
+
+  .brand-badge {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, var(--accent) 0%, #4f46e5 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 22px;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+  }
+
+  .brand h1 {
+    font-size: 24px;
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--ink) 30%, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .brand-sub {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: var(--ink-muted);
+    font-weight: 500;
+  }
+
+  .premises {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    color: var(--ink-secondary);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 7px 16px;
+    white-space: nowrap;
+    box-shadow: var(--shadow);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Indicador de Conexão: Somente a Bolinha Verde */
+  .live-indicator {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    box-shadow: var(--shadow);
+  }
+
+  .live-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--good);
+    box-shadow: 0 0 0 3px var(--good-wash);
+    animation: pulse 2s infinite;
+  }
+  .live-dot.off {
+    background: var(--ink-muted);
+    box-shadow: none;
+    animation: none;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  }
+
+  /* ===== Navegação Visual por Abas de Frentes ===== */
+  .frente-tabs-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 4px 0 16px;
+    margin-bottom: 12px;
+    scrollbar-width: thin;
+  }
+  .frente-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+    box-shadow: var(--shadow);
+  }
+  .frente-tab:hover {
+    background: var(--surface-hover);
+    color: var(--ink);
+    transform: translateY(-1px);
+  }
+  .frente-tab.active {
+    background: var(--accent-wash);
+    color: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
+  }
+  .frente-tab-count {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--ink-muted);
+  }
+  .frente-tab.active .frente-tab-count {
+    background: var(--accent);
+    color: #ffffff;
+  }
+
+  /* Buttons */
+  .btn {
+    appearance: none;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s ease;
+    box-shadow: var(--shadow);
+  }
+  .btn:hover {
+    background: var(--surface-hover);
+    border-color: var(--ink-muted);
+    transform: translateY(-1px);
+  }
+  .btn:active { transform: translateY(0); }
+  
+  .btn-accent {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+    color: var(--accent-fg);
+    border-color: transparent;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+  }
+  .btn-accent:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 6px 18px rgba(99, 102, 241, 0.45);
+  }
+  
+  .btn-ghost {
+    background: transparent;
+    border-color: transparent;
+    color: var(--ink-secondary);
+    box-shadow: none;
+  }
+  .btn-ghost:hover {
+    background: var(--surface-2);
+    color: var(--ink);
+  }
+  
+  .btn-danger {
+    background: transparent;
+    border-color: transparent;
+    color: var(--critical);
+    box-shadow: none;
+  }
+  .btn-danger:hover {
+    background: var(--critical-wash);
+  }
+  
+  .btn-sm {
+    padding: 7px 12px;
+    font-size: 12.5px;
+    border-radius: 8px;
+  }
+
+  .filterbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+  }
+  .filterbar select, .filterbar input[type="text"] {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 13px;
+    color: var(--ink);
+    min-width: 150px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .filterbar select:focus, .filterbar input[type="text"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-wash);
+  }
+  .filterbar input[type="text"] {
+    min-width: 220px;
+    flex: 1;
+  }
+  .filterbar .spacer { flex: 1; }
+
+  main {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    box-shadow: var(--shadow);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  
+  .panel-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .panel-head h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .panel-head p {
+    margin: 3px 0 0;
+    font-size: 13px;
+    color: var(--ink-muted);
+  }
+  
+  .row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+  }
+  .row-2 .panel { margin: 0; }
+  @media (max-width: 1024px) {
+    .row-2 { grid-template-columns: 1fr; }
+  }
+
+  /* ===== KPIs ===== */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 1024px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 580px) { .kpi-grid { grid-template-columns: 1fr; } }
+  
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .kpi:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+  .kpi::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--accent);
+    opacity: 0.7;
+  }
+  .kpi-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-muted);
+  }
+  .kpi-value {
+    font-family: "IBM Plex Mono", monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 26px;
+    font-weight: 700;
+    margin-top: 8px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .kpi-sub {
+    font-size: 12px;
+    color: var(--ink-secondary);
+    margin-top: 6px;
+    font-weight: 500;
+  }
+  .kpi-sub.good { color: var(--good); }
+  .kpi-sub.critical { color: var(--critical); }
+  .kpi-tag {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: 20px;
+    opacity: 0.85;
+  }
+
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 768px) { .kpi-strip { grid-template-columns: 1fr; } }
+  
+  .kpi-chip {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    box-shadow: var(--shadow);
+  }
+  .kpi-chip-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: var(--accent-wash);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .kpi-chip-text {
+    display: flex;
+    flex-direction: column;
+  }
+  .kpi-chip-val {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--ink);
+  }
+  .kpi-chip-label {
+    font-size: 12px;
+    color: var(--ink-muted);
+  }
+
+  /* ===== Badges / Chips ===== */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .chip-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .chip-good { background: var(--good-wash); color: var(--good); }
+  .chip-warning { background: var(--warning-wash); color: var(--warning); }
+  .chip-critical { background: var(--critical-wash); color: var(--critical); }
+  .chip-muted { background: var(--surface-2); color: var(--ink-muted); }
+
+  /* ===== Charts ===== */
+  svg text {
+    font-family: "IBM Plex Sans", sans-serif;
+    fill: var(--ink-secondary);
+  }
+  svg .mono-text { font-family: "IBM Plex Mono", monospace; }
+  .axis-line { stroke: var(--grid); stroke-width: 1.5; }
+  .grid-line { stroke: var(--grid); stroke-width: 1; stroke-dasharray: 3 3; }
+  
+  .tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 12.5px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-strong);
+    z-index: 999;
+    max-width: 260px;
+    line-height: 1.5;
+    transition: opacity 0.1s ease;
+  }
+  .tooltip b { font-weight: 700; color: var(--ink); }
+  .tooltip .tt-row { display: flex; justify-content: space-between; gap: 16px; margin-top: 2px; }
+
+  .legend {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+    font-size: 12.5px;
+    color: var(--ink-secondary);
+  }
+  .legend-item { display: flex; align-items: center; gap: 7px; }
+  .legend-swatch { width: 12px; height: 12px; border-radius: 3px; }
+
+  /* Barlist */
+  .barlist { display: flex; flex-direction: column; gap: 11px; }
+  .barlist-row {
+    display: grid;
+    grid-template-columns: 160px 1fr 75px;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+  }
+  .barlist-row .rowlabel {
+    color: var(--ink-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+  }
+  .barlist-track {
+    background: var(--surface-2);
+    border-radius: 8px;
+    height: 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .barlist-fill {
+    height: 100%;
+    border-radius: 8px;
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .barlist-val {
+    font-family: "IBM Plex Mono", monospace;
+    text-align: right;
+    font-size: 12.5px;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .swatch { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+
+  /* Funnel */
+  .funnel { display: flex; flex-direction: column; gap: 8px; }
+  .funnel-row {
+    display: grid;
+    grid-template-columns: 130px 1fr 30px;
+    align-items: center;
+    gap: 12px;
+  }
+  .funnel-label { font-size: 12px; color: var(--ink-secondary); text-align: right; font-weight: 500; }
+  .funnel-track { background: var(--surface-2); border-radius: 6px; height: 18px; }
+  .funnel-fill { height: 100%; border-radius: 6px; transition: width 0.5s ease; }
+  .funnel-count { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; color: var(--ink-muted); font-weight: 600; }
+
+  /* Process Cards */
+  .proc-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .proc-toolbar select {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  .proc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 980px) { .proc-grid { grid-template-columns: 1fr; } }
+  
+  .proc-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    padding: 16px 18px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .proc-card:hover {
+    border-color: var(--border-strong);
+    box-shadow: var(--shadow);
+  }
+  .proc-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .proc-icon-actions { display: flex; gap: 6px; flex: none; }
+  .proc-name {
+    font-weight: 700;
+    font-size: 15px;
+    font-family: "Outfit", sans-serif;
+    color: var(--ink);
+  }
+  .proc-chips {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .proc-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 14px 0 6px;
+    background: var(--surface);
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .proc-stat-label {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+  .proc-stat-val {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 700;
+    font-size: 15px;
+    margin-top: 2px;
+  }
+  .proc-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    align-items: center;
+  }
+  .proc-detail {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border-strong);
+    display: none;
+  }
+  .proc-detail.open { display: block; }
+  
+  .compare-row {
+    display: grid;
+    grid-template-columns: 85px 1fr;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 12px;
+  }
+  .compare-label { color: var(--ink-muted); font-weight: 500; }
+  .compare-bar-wrap { display: flex; align-items: center; gap: 10px; }
+  .compare-bar-track {
+    flex: 1;
+    background: var(--surface);
+    border-radius: 6px;
+    height: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .compare-bar-fill { height: 100%; transition: width 0.4s ease; }
+  .compare-bar-fill.asis { background: var(--ink-muted); }
+  .compare-bar-fill.tobe { background: var(--accent); }
+  .compare-val {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    width: 90px;
+    text-align: right;
+    color: var(--ink-secondary);
+    font-weight: 500;
+  }
+  
+  .track-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-top: 12px;
+  }
+  .track-table th {
+    text-align: left;
+    font-weight: 600;
+    color: var(--ink-muted);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 6px 8px 6px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .track-table td {
+    padding: 8px 8px 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-family: "IBM Plex Mono", monospace;
+  }
+  .empty-note { font-size: 13px; color: var(--ink-muted); padding: 12px 0; }
+
+  /* ===== Overlay / Modal ===== */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    z-index: 500;
+    padding: 5vh 16px;
+    overflow-y: auto;
+    pointer-events: auto;
+  }
+  .overlay[hidden] {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+  }
+
+  /* ===== Dedicated Landing Login Screen ===== */
+  .login-screen-view {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    background: var(--bg);
+    position: relative;
+  }
+  .login-screen-view[hidden] {
+    display: none !important;
+  }
+  .login-header-top {
+    position: absolute;
+    top: 24px;
+    right: 32px;
+    display: flex;
+    gap: 12px;
+  }
+  .login-card-container {
+    width: 100%;
+    max-width: 440px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 20px;
+    padding: 36px 32px;
+    box-shadow: var(--shadow-lg);
+    animation: modalIn 0.25s ease-out;
+  }
+  .login-brand-header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .login-brand-header .brand-badge {
+    margin: 0 auto 14px;
+    width: 54px;
+    height: 54px;
+    font-size: 26px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent) 0%, #4f46e5 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
+  }
+  .login-brand-header h1 {
+    font-size: 24px;
+    font-weight: 800;
+    font-family: "Outfit", sans-serif;
+    background: linear-gradient(90deg, var(--ink) 30%, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .login-brand-header p {
+    font-size: 13px;
+    color: var(--ink-secondary);
+    margin-top: 4px;
+    font-weight: 500;
+  }
+  .modal {
+    background: var(--surface);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 720px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
+    animation: modalIn 0.2s ease-out;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: translateY(10px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 26px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-head h2 { font-size: 19px; }
+  .modal-body { padding: 24px 26px; max-height: 68vh; overflow-y: auto; }
+  
+  .form-section { margin-bottom: 24px; }
+  .form-section h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    font-family: "IBM Plex Sans", sans-serif;
+    font-weight: 700;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .form-section h3 .num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--accent-wash);
+    color: var(--accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.full { grid-column: 1 / -1; }
+  .field label { font-size: 12.5px; font-weight: 600; color: var(--ink-secondary); }
+  .field .hint { font-size: 11px; color: var(--ink-muted); font-weight: 400; }
+  .field input, .field select, .field textarea {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 10px 12px;
+    font-size: 13.5px;
+    color: var(--ink);
+    width: 100%;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .field textarea { resize: vertical; min-height: 60px; }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-wash);
+  }
+  
+  .modal-foot {
+    border-top: 1px solid var(--border);
+    padding: 16px 26px;
+    background: var(--surface-2);
+    border-radius: 0 0 20px 20px;
+  }
+  .preview-strip { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 14px; }
+  .preview-item { display: flex; flex-direction: column; }
+  .preview-item .l { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-muted); font-weight: 600; }
+  .preview-item .v { font-family: "IBM Plex Mono", monospace; font-weight: 700; font-size: 16px; color: var(--ink); }
+  .modal-foot-actions { display: flex; justify-content: flex-end; gap: 12px; }
+  
+  .modal-close {
+    background: transparent;
+    border: none;
+    color: var(--ink-muted);
+    font-size: 22px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+  .modal-close:hover { color: var(--ink); background: var(--surface-2); }
+  
+  .banner {
+    font-size: 13px;
+    padding: 11px 15px;
+    border-radius: 10px;
+    background: var(--warning-wash);
+    color: var(--warning);
+    margin-bottom: 16px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+  .section-note { font-size: 12px; color: var(--ink-muted); margin-top: 14px; line-height: 1.6; }
+
+  /* Param modal */
+  .param-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; max-height: 160px; overflow-y: auto; }
+  .param-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  .param-list-item .tag { font-size: 10.5px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+  .param-list-item .rm { background: transparent; border: none; color: var(--critical); cursor: pointer; font-size: 12px; font-weight: 600; padding: 2px 6px; }
+  .param-list-item .rm:hover { text-decoration: underline; }
+  .param-add-row { display: flex; gap: 10px; }
+  .param-add-row input, .param-add-row select {
+    flex: 1;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .month-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+  .month-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 12px;
+  }
+  .month-row label { font-size: 13px; color: var(--ink-secondary); }
+  .month-row input {
+    width: 64px;
+    text-align: right;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 13px;
+    color: var(--ink);
+  }
+
+  /* Toast Notification */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--ink);
+    color: var(--surface);
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: toastIn 0.25s ease-out;
+  }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-muted);
+    padding: 36px 0 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+  </style>
+</head>
+<body>
+
+<!-- ===== Dedicated Landing Login Screen ===== -->
+<div id="login-screen-view" class="login-screen-view">
+  <div class="login-header-top">
+    <button class="btn btn-ghost" id="btn-landing-theme" title="Alternar tema claro/escuro">🌙 Tema</button>
+  </div>
+
+  <div class="login-card-container">
+    <div class="login-brand-header">
+      <div class="brand-badge">G</div>
+      <h1>Painel de Melhorias</h1>
+      <p>Gertec · Manufatura · Engenharia · Recursos Humanos</p>
+    </div>
+
+    <div class="banner" id="login-banner" hidden><span id="login-banner-text"></span></div>
+    
+    <div style="display:flex;gap:10px;margin-bottom:20px">
+      <button class="btn btn-ghost btn-sm active" id="tab-login-mode" style="flex:1;border-bottom:2px solid var(--accent);color:var(--accent);font-weight:700">Entrar</button>
+      <button class="btn btn-ghost btn-sm" id="tab-signup-mode" style="flex:1;font-weight:600">Criar Conta</button>
+    </div>
+
+    <form id="auth-form" onsubmit="return false;">
+      <div class="form-section" style="margin-bottom:16px">
+        <div class="field" style="margin-bottom:14px">
+          <label>E-mail*</label>
+          <input type="email" id="auth-email" placeholder="seu.email@gertec.com.br" required autocomplete="username">
+        </div>
+        <div class="field" style="margin-bottom:20px">
+          <label>Senha*</label>
+          <input type="password" id="auth-password" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <button type="button" class="btn btn-accent" id="auth-submit-btn" style="width:100%;justify-content:center;font-size:14px;padding:12px">Entrar com E-mail</button>
+      </div>
+    </form>
+
+    <div style="text-align:center;margin:18px 0 16px;font-size:12px;color:var(--ink-muted);position:relative">
+      <span style="background:var(--surface);padding:0 10px;position:relative;z-index:1">ou continue com</span>
+      <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border)"></div>
+    </div>
+
+    <button class="btn btn-ghost" id="btn-google-login" style="width:100%;justify-content:center;border:1px solid var(--border-strong);padding:11px">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+      Entrar com Google
+    </button>
+
+    <div style="margin-top:20px;text-align:center">
+      <button class="btn btn-ghost btn-sm" id="btn-guest-mode" style="color:var(--ink-muted);font-weight:500">Continuar como Visitante</button>
+    </div>
+  </div>
+</div>
+
+<div id="app" hidden>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-badge">G</div>
+      <div>
+        <h1 class="brand-h1">Painel de Melhorias</h1>
+        <p class="brand-sub">Gertec · Manufatura · Engenharia · Recursos Humanos</p>
+      </div>
+    </div>
+    <span class="premises" id="premises-chip">22 dias úteis · 8h/dia · 12 meses/ano</span>
+    
+    <!-- Conexão: Somente a bolinha verde sem texto -->
+    <span class="live-indicator" id="live-indicator-container" title="Conectado em tempo real">
+      <span class="live-dot" id="live-dot"></span>
+    </span>
+
+    <!-- Autenticação & Usuário -->
+    <div style="display:flex;align-items:center;gap:10px" id="auth-container">
+      <button class="btn btn-ghost" id="btn-open-login">🔐 Entrar</button>
+      <div id="user-info-badge" hidden style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-secondary)">
+        <span id="user-email-display" style="font-weight:600"></span>
+        <button class="btn btn-ghost btn-sm" id="btn-logout" title="Sair da conta">Sair</button>
+      </div>
+    </div>
+
+    <button class="btn btn-ghost" id="btn-theme" title="Alternar tema claro/escuro">🌙 Tema</button>
+    <button class="btn btn-ghost" id="btn-export" title="Exportar dados para CSV">Exportar CSV</button>
+    <button class="btn btn-ghost" id="btn-params">Parâmetros</button>
+    <button class="btn btn-ghost" id="btn-admin-modal" hidden>Administração</button>
+    <button class="btn btn-accent" id="btn-add">+ Nova mensuração</button>
+  </header>
+
+  <!-- Visual Frente Tabs Bar -->
+  <div class="frente-tabs-bar" id="frente-tabs-bar"></div>
+
+  <nav class="filterbar">
+    <select id="f-frente"><option value="">Todas as frentes</option></select>
+    <select id="f-setor"><option value="">Todos os setores</option></select>
+    <select id="f-status"><option value="">Todos os status</option></select>
+    <input type="text" id="f-search" placeholder="Buscar processo ou responsável…">
+    <span class="spacer"></span>
+    <button class="btn btn-ghost btn-sm" id="f-clear">Limpar filtros</button>
+  </nav>
+
+  <main>
+    <section class="kpi-grid" id="kpi-grid"></section>
+    <section class="kpi-strip" id="kpi-strip"></section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Retorno vs. Investimento</h2>
+          <p>Cada bolha representa um processo · tamanho proporcional às horas economizadas/ano</p>
+        </div>
+      </div>
+      <svg id="chart-scatter" viewBox="0 0 860 380" style="width:100%;height:auto;overflow:visible"></svg>
+      <div class="legend" id="legend-scatter"></div>
+    </section>
+
+    <div class="row-2">
+      <section class="panel">
+        <div class="panel-head"><div><h2>Payback por Processo</h2><p>Meses até o investimento se pagar</p></div></div>
+        <div class="barlist" id="chart-payback"></div>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><div><h2>Economia por Frente</h2><p>Ganho bruto anual (R$)</p></div></div>
+        <svg id="chart-frente" viewBox="0 0 300 200" style="width:100%;height:auto;overflow:visible"></svg>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><div><h2>Funil de Status</h2><p>Iniciativas por etapa do pipeline</p></div></div>
+        <div class="funnel" id="chart-status"></div>
+      </section>
+    </div>
+
+    <div class="row-2" style="grid-template-columns:1.3fr 1fr">
+      <section class="panel">
+        <div class="panel-head"><div><h2>Previsto × Realizado</h2><p>Economia financeira mensal acompanhada</p></div></div>
+        <svg id="chart-trend" viewBox="0 0 620 260" style="width:100%;height:auto;overflow:visible"></svg>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><div><h2>Economia por Setor</h2><p>Ganho bruto anual (R$)</p></div></div>
+        <div class="barlist" id="chart-setor"></div>
+      </section>
+    </div>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div><h2>Processos Cadastrados</h2><p id="count-procs">—</p></div>
+        <div class="proc-toolbar">
+          <select id="proc-sort">
+            <option value="economia">Ordenar: economia anual</option>
+            <option value="roi">Ordenar: ROI</option>
+            <option value="payback">Ordenar: payback</option>
+            <option value="horas">Ordenar: horas economizadas</option>
+            <option value="nome">Ordenar: nome</option>
+          </select>
+        </div>
+      </div>
+      <div class="proc-grid" id="proc-grid"></div>
+    </section>
+  </main>
+
+  <footer>Ferramenta de Mensuração de Melhorias — Gertec. Fórmulas replicam o modelo AS-IS × TO-BE original.</footer>
+</div>
+
+<div id="tooltip" class="tooltip" hidden></div>
+<div id="toast" class="toast" hidden></div>
+
+<!-- ===== Painel de Administração & Permissões Modal ===== -->
+<div class="overlay" id="admin-overlay" hidden>
+  <div class="modal" style="max-width:820px">
+    <div class="modal-head">
+      <h2>Administração &amp; Permissões de Usuários</h2>
+      <button class="modal-close" id="admin-close" aria-label="Fechar">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:12px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:10px">
+        <button class="btn btn-ghost btn-sm active" id="tab-adm-users" style="border-bottom:2px solid var(--accent);color:var(--accent)">Permissões por E-mail</button>
+        <button class="btn btn-ghost btn-sm" id="tab-adm-params">Parâmetros de Cálculo</button>
+      </div>
+
+      <!-- Seção 1: Permissões de Usuários por E-mail -->
+      <div id="adm-sec-users">
+        <p class="section-note" style="margin-top:0;margin-bottom:16px">
+          Gerencie quem pode acessar o sistema e quais frentes de atuação cada usuário cadastrado por e-mail tem permissão de visualizar e alterar.
+        </p>
+
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px">
+          <h3 style="font-size:14px;margin-bottom:12px">Adicionar / Editar Permissão</h3>
+          <div class="form-grid cols-3" style="gap:12px">
+            <div class="field" style="grid-column: span 2">
+              <label>E-mail do Usuário*</label>
+              <input type="email" id="adm-user-email" placeholder="exemplo@gertec.com.br">
+            </div>
+            <div class="field">
+              <label>Função (Perfil)*</label>
+              <select id="adm-user-role">
+                <option value="viewer">Leitor (Apenas Visualização)</option>
+                <option value="editor">Editor (Cria e Edita)</option>
+                <option value="admin">Administrador (Acesso Total)</option>
+              </select>
+            </div>
+            <div class="field" style="grid-column: span 2">
+              <label>Frentes Visíveis (O que pode ver)*</label>
+              <select id="adm-user-frentes" multiple style="height:74px">
+                <option value="*" selected>Todas as Frentes (*)</option>
+              </select>
+              <span class="hint">Mantenha Ctrl / Cmd pressionado para selecionar múltiplas</span>
+            </div>
+            <div class="field" style="display:flex;flex-direction:column;justify-content:flex-end">
+              <button class="btn btn-accent btn-sm" id="adm-save-user-btn" style="height:40px;justify-content:center">+ Salvar Permissão</button>
+            </div>
+          </div>
+        </div>
+
+        <h3 style="font-size:14px;margin-bottom:10px">Usuários Cadastrados &amp; Permissões</h3>
+        <table class="track-table" id="adm-users-table">
+          <thead>
+            <tr>
+              <th>E-mail</th>
+              <th>Função</th>
+              <th>Frentes Visíveis</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="adm-users-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- Seção 2: Parâmetros do Sistema -->
+      <div id="adm-sec-params" hidden>
+        <p class="section-note" style="margin-top:0;margin-bottom:16px">
+          Ajuste as premissas gerais de cálculo e as frentes / setores cadastrados no painel.
+        </p>
+        <div id="adm-params-container"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <div class="modal-foot-actions">
+        <button class="btn btn-ghost" id="admin-cancel">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Wizard Modal: Add/Edit Processo ===== -->
+<div class="overlay" id="wizard-overlay" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="wizard-title">Nova mensuração de melhoria</h2>
+      <button class="modal-close" id="wizard-close" aria-label="Fechar">✕</button>
+    </div>
+    <div class="modal-body" id="wizard-body">
+      <div class="banner" id="wizard-banner" hidden><span id="wizard-banner-text"></span></div>
+
+      <div class="form-section">
+        <h3><span class="num">1</span>Identificação</h3>
+        <div class="form-grid">
+          <div class="field"><label>Frente*</label><select id="w-frente"></select></div>
+          <div class="field"><label>Setor*</label><select id="w-setor"></select></div>
+          <div class="field full"><label>Nome do processo*</label><input type="text" id="w-nome" placeholder="Ex.: Conferência de estoque na linha SMT"></div>
+          <div class="field"><label>Responsável</label><input type="text" id="w-responsavel" placeholder="Nome do responsável"></div>
+          <div class="field"><label>Status da iniciativa</label><select id="w-status"></select></div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3><span class="num">2</span>Cenário anterior (AS-IS)</h3>
+        <div class="form-grid cols-3">
+          <div class="field"><label>Unidade de tempo*</label><select id="w-asis-unidade"></select></div>
+          <div class="field"><label>Tempo por execução*</label><input type="number" min="0" step="any" id="w-asis-tempo" placeholder="0"></div>
+          <div class="field"><label>Pessoas envolvidas*</label><input type="number" min="0" step="any" id="w-asis-pessoas" value="1"></div>
+          <div class="field"><label>Frequência de execução*</label><input type="number" min="0" step="any" id="w-asis-freq" placeholder="0"></div>
+          <div class="field"><label>Periodicidade*</label><select id="w-asis-periodicidade"></select></div>
+          <div class="field"><label>Valor médio da hora (R$)*</label><input type="number" min="0" step="any" id="w-asis-valorhora" placeholder="0"></div>
+          <div class="field"><label>Outros custos mensais (R$)</label><input type="number" min="0" step="any" id="w-asis-outros" value="0"></div>
+          <div class="field"><label>% Retrabalho <span class="hint">opcional</span></label><input type="number" min="0" max="100" step="any" id="w-asis-retrabalho" value="0"></div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3><span class="num">3</span>Melhoria implementada &amp; cenário novo (TO-BE)</h3>
+        <div class="form-grid">
+          <div class="field full"><label>Nome da melhoria*</label><input type="text" id="w-melhoria-nome" placeholder="Ex.: Leitor de código de barras integrado ao ERP"></div>
+          <div class="field"><label>Tipo de melhoria</label><select id="w-melhoria-tipo"></select></div>
+          <div class="field"><label>Custo mensal de manutenção (R$)</label><input type="number" min="0" step="any" id="w-impl-manutencao" value="0"></div>
+        </div>
+        <div class="form-grid cols-3" style="margin-top:12px;grid-template-columns:repeat(4,1fr)">
+          <div class="field"><label>Custo desenvolvimento (R$)</label><input type="number" min="0" step="any" id="w-impl-dev" value="0"></div>
+          <div class="field"><label>Custo aquisição (R$)</label><input type="number" min="0" step="any" id="w-impl-aquis" value="0"></div>
+          <div class="field"><label>Custo treinamento (R$)</label><input type="number" min="0" step="any" id="w-impl-trein" value="0"></div>
+          <div class="field"><label>Outros custos impl. (R$)</label><input type="number" min="0" step="any" id="w-impl-outros" value="0"></div>
+        </div>
+        <div class="form-grid cols-3" style="margin-top:14px">
+          <div class="field"><label>Novo tempo por execução*</label><input type="number" min="0" step="any" id="w-tobe-tempo" placeholder="0"></div>
+          <div class="field"><label>Nova qtd. pessoas*</label><input type="number" min="0" step="any" id="w-tobe-pessoas" value="1"></div>
+          <div class="field"><label>Nova frequência*</label><input type="number" min="0" step="any" id="w-tobe-freq" placeholder="0"></div>
+          <div class="field"><label>Nova periodicidade</label><select id="w-tobe-periodicidade"></select></div>
+          <div class="field"><label>Novo valor da hora (R$)</label><input type="number" min="0" step="any" id="w-tobe-valorhora" placeholder="0"></div>
+          <div class="field"><label>Novos outros custos mensais (R$)</label><input type="number" min="0" step="any" id="w-tobe-outros" value="0"></div>
+          <div class="field"><label>Novo % retrabalho</label><input type="number" min="0" max="100" step="any" id="w-tobe-retrabalho" value="0"></div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3><span class="num">4</span>Validação &amp; observações</h3>
+        <div class="form-grid">
+          <div class="field"><label>Status de validação</label><select id="w-validacao"></select></div>
+          <div class="field"><label>Categoria do benefício</label><select id="w-categoria"></select></div>
+          <div class="field full"><label>Observações / evidências</label><textarea id="w-obs" placeholder="Como o resultado foi medido, fontes, ressalvas…"></textarea></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <div class="preview-strip" id="wizard-preview"></div>
+      <div class="modal-foot-actions">
+        <button class="btn btn-ghost" id="wizard-cancel">Cancelar</button>
+        <button class="btn btn-accent" id="wizard-save">Salvar mensuração</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Track Modal: Monthly Follow-up ===== -->
+<div class="overlay" id="track-overlay" hidden>
+  <div class="modal" style="max-width:460px">
+    <div class="modal-head">
+      <h2>Registrar Acompanhamento Mensal</h2>
+      <button class="modal-close" id="track-close" aria-label="Fechar">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field full"><label>Processo</label><div id="track-proc-name" style="font-weight:700;font-size:15px;color:var(--accent)"></div></div>
+        <div class="field"><label>Mês*</label><select id="t-mes"></select></div>
+        <div class="field"><label>Ano*</label><input type="number" id="t-ano" value="2026"></div>
+        <div class="field full"><label>Horas efetivamente consumidas no mês*</label><input type="number" min="0" step="any" id="t-horas" placeholder="0"></div>
+        <div class="field full"><label>Evidência / Fonte do dado</label><input type="text" id="t-evidencia" placeholder="Ex.: Apontamento do sistema ERP"></div>
+        <div class="field full"><label>Observações</label><textarea id="t-obs" placeholder="Anotações adicionais..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <div class="preview-strip" id="track-preview"></div>
+      <div class="modal-foot-actions">
+        <button class="btn btn-ghost" id="track-cancel">Cancelar</button>
+        <button class="btn btn-accent" id="track-save">Salvar acompanhamento</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Params Modal ===== -->
+<div class="overlay" id="params-overlay" hidden>
+  <div class="modal" style="max-width:680px">
+    <div class="modal-head">
+      <h2>Parâmetros da Ferramenta</h2>
+      <button class="modal-close" id="params-close" aria-label="Fechar">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-section">
+        <h3><span class="num">1</span>Frentes</h3>
+        <div class="param-list" id="param-frentes-list"></div>
+        <div class="param-add-row">
+          <input type="text" id="param-frente-new" placeholder="Nova frente (ex.: Comercial)">
+          <button class="btn btn-ghost btn-sm" id="param-frente-add">+ Adicionar</button>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3><span class="num">2</span>Setores</h3>
+        <div class="param-list" id="param-setores-list"></div>
+        <div class="param-add-row">
+          <select id="param-setor-frente"></select>
+          <input type="text" id="param-setor-new" placeholder="Novo setor">
+          <button class="btn btn-ghost btn-sm" id="param-setor-add">+ Adicionar</button>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3><span class="num">3</span>Status da Iniciativa</h3>
+        <div class="param-list" id="param-status-list"></div>
+        <div class="param-add-row">
+          <input type="text" id="param-status-new" placeholder="Novo status (ex.: Aguardando aprovação)">
+          <button class="btn btn-ghost btn-sm" id="param-status-add">+ Adicionar</button>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3><span class="num">4</span>Premissas de Cálculo</h3>
+        <div class="form-grid" style="margin-bottom:14px">
+          <div class="field"><label>Jornada diária (horas)</label><input type="number" min="0" step="any" id="param-jornada"></div>
+          <div class="field"><label>Meses considerados por ano</label><input type="text" value="12" disabled></div>
+        </div>
+        <label style="font-size:12.5px;font-weight:600;color:var(--ink-secondary);display:block;margin-bottom:8px;">
+          Dias úteis por mês <span style="font-size:11px;font-weight:400;color:var(--ink-muted)">usados para converter frequências "diárias" em execuções/ano</span>
+        </label>
+        <div class="month-grid" id="param-months"></div>
+        <p class="section-note">Alterar as premissas recalcula automaticamente todos os processos cadastrados.</p>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <div class="modal-foot-actions">
+        <button class="btn btn-ghost" id="params-cancel">Fechar</button>
+        <button class="btn btn-accent" id="params-save">Salvar premissas</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+"use strict";
+
+/* ============================================================
+   FIREBASE CONFIG & DYNAMIC LOAD
+============================================================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyDwInweUhckLx83CyxfFm00_UFiPvgjn60",
+  authDomain: "painel-gertec.firebaseapp.com",
+  projectId: "painel-gertec",
+  storageBucket: "painel-gertec.firebasestorage.app",
+  messagingSenderId: "873194632039",
+  appId: "1:873194632039:web:f409a82dd6d73b7ffe75c2"
+};
+
+let fbApp = null, fbDb = null, fbAuth = null;
+let setDoc = null, doc = null, collection = null, getDoc = null, addDoc = null, deleteDoc = null, onSnapshot = null;
+let signInWithEmailAndPassword = null, createUserWithEmailAndPassword = null, signInWithPopup = null, GoogleAuthProvider = null, signOut = null, onAuthStateChanged = null;
+
+async function initFirebase() {
+  try {
+    const appMod = await import("https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js");
+    const fsMod = await import("https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js");
+    const authMod = await import("https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js");
+
+    fbApp = appMod.initializeApp(firebaseConfig);
+    fbDb = fsMod.getFirestore(fbApp);
+    fbAuth = authMod.getAuth(fbApp);
+
+    setDoc = fsMod.setDoc;
+    doc = fsMod.doc;
+    collection = fsMod.collection;
+    getDoc = fsMod.getDoc;
+    addDoc = fsMod.addDoc;
+    deleteDoc = fsMod.deleteDoc;
+    onSnapshot = fsMod.onSnapshot;
+
+    signInWithEmailAndPassword = authMod.signInWithEmailAndPassword;
+    createUserWithEmailAndPassword = authMod.createUserWithEmailAndPassword;
+    signInWithPopup = authMod.signInWithPopup;
+    GoogleAuthProvider = authMod.GoogleAuthProvider;
+    signOut = authMod.signOut;
+    onAuthStateChanged = authMod.onAuthStateChanged;
+
+    if (fbAuth && onAuthStateChanged) {
+      onAuthStateChanged(fbAuth, (user) => {
+        updateAuthUI(user);
+        if (user) {
+          setLiveStatus(true);
+          subscribeFirestoreData();
+        } else {
+          setLiveStatus(false);
+        }
+      });
+    }
+  } catch(e) {
+    console.warn("Firebase CDN indisponível ou sem rede. Funcionando normalmente em modo local/offline.", e);
+    setLiveStatus(false);
+  }
+}
+
+/* ============================================================
+   PARÂMETROS & CONSTANTES
+============================================================ */
+const MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const CONST = { diasUteisPorMes: Object.fromEntries(MESES.map(m=>[m,22])), mesesPorAno:12, jornadaDiaria:8 };
+const BASE_FRENTES = ["Manufatura","Engenharia","Recursos Humanos"];
+const BASE_SETORES = {
+  "Manufatura": ["Manufatura - Produção","Manufatura - Qualidade","Manufatura - Logística Interna"],
+  "Engenharia": ["Engenharia - Processos","Engenharia - Manutenção","Engenharia - Projetos"],
+  "Recursos Humanos": ["RH - Recrutamento e Seleção","RH - Departamento Pessoal","RH - Treinamento e Desenvolvimento"]
+};
+const BASE_STATUS_INICIATIVA = ["Identificado","Em análise","Planejado","Em desenvolvimento","Em teste","Implementado","Validado","Suspenso"];
+const FRENTES = []; const SETORES = {}; const STATUS_INICIATIVA = [];
+const TIPOS_MELHORIA = ["Automação","Digitalização","Padronização","Integração de sistemas","Eliminação de retrabalho","Gestão visual","Redesenho do processo","Criação de indicador","Desenvolvimento de ferramenta","Inteligência artificial","Outro"];
+const STATUS_CONCLUIDO = new Set(["Implementado","Validado"]);
+const UNIDADES_TEMPO = ["Minutos","Horas","Dias"];
+const PERIODICIDADES = ["Diária","Semanal","Quinzenal","Mensal","Trimestral","Semestral","Anual"];
+const CATEGORIAS_BENEFICIO = ["Economia financeira realizada","Economia financeira potencial","Capacidade operacional liberada"];
+const STATUS_VALIDACAO = ["Não validado","Em validação","Validado","Não confirmado"];
+const CATEGORICAL_HEX = {
+  light: ["#3b82f6","#f97316","#10b981","#f59e0b","#ec4899","#14b8a6","#6366f1","#ef4444"],
+  dark:  ["#60a5fa","#fb923c","#34d399","#fbbf24","#f472b6","#2dd4bf","#818cf8","#f87171"]
+};
+
+function rebuildParamLists(){
+  FRENTES.length = 0;
+  FRENTES.push(...BASE_FRENTES, ...state.customFrentes);
+  Object.keys(SETORES).forEach(k=> delete SETORES[k]);
+  FRENTES.forEach(f=>{ SETORES[f] = [...(BASE_SETORES[f]||[]), ...(state.customSetores[f]||[])]; });
+  STATUS_INICIATIVA.length = 0;
+  const semSuspenso = BASE_STATUS_INICIATIVA.filter(s=>s!=="Suspenso");
+  STATUS_INICIATIVA.push(...semSuspenso, ...state.customStatus, "Suspenso");
+}
+function statusOrder(){ return STATUS_INICIATIVA.filter(s=>s!=="Suspenso"); }
+function diasUteisAno(){ return Object.values(CONST.diasUteisPorMes).reduce((a,b)=>a+(Number(b)||0),0); }
+
+function isDark(){
+  const stamp = document.documentElement.getAttribute("data-theme");
+  if(stamp === "dark") return true;
+  if(stamp === "light") return false;
+  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+function frenteHex(f){
+  const idx = FRENTES.indexOf(f);
+  const table = isDark() ? CATEGORICAL_HEX.dark : CATEGORICAL_HEX.light;
+  return idx>=0 ? table[idx % table.length] : (isDark()?"#94a3b8":"#64748b");
+}
+
+/* ============================================================
+   MOTOR DE CÁLCULO
+============================================================ */
+function safeDiv(a,b){ return b ? a/b : 0; }
+function horasPorExecucao(unidade,tempo,jornada){
+  tempo = Number(tempo)||0;
+  if(unidade==="Minutos") return tempo/60;
+  if(unidade==="Dias") return tempo*jornada;
+  return tempo;
+}
+function execucoesAno(freq,periodicidade){
+  freq = Number(freq)||0;
+  switch(periodicidade){
+    case "Diária": return freq*diasUteisAno();
+    case "Semanal": return freq*52;
+    case "Quinzenal": return freq*24;
+    case "Mensal": return freq*CONST.mesesPorAno;
+    case "Trimestral": return freq*4;
+    case "Semestral": return freq*2;
+    case "Anual": return freq*1;
+    default: return freq*1;
+  }
+}
+function computeScenario(sc){
+  const execAno = execucoesAno(sc.freq, sc.periodicidade);
+  const execMes = safeDiv(execAno, CONST.mesesPorAno);
+  const horasExec = horasPorExecucao(sc.unidade, sc.tempo, CONST.jornadaDiaria);
+  const pessoas = Number(sc.pessoas)||0;
+  const valorHora = Number(sc.valorHora)||0;
+  const outrosCustos = Number(sc.outrosCustos)||0;
+  const tempoMensal = horasExec*pessoas*execMes;
+  const tempoAnual = horasExec*pessoas*execAno;
+  const custoMensalMO = tempoMensal*valorHora;
+  const custoAnualMO = tempoAnual*valorHora;
+  const custoAnualTotal = custoAnualMO + outrosCustos*12;
+  return { execAno, execMes, horasExec, tempoMensal, tempoAnual, custoMensalMO, custoAnualMO, custoAnualTotal, outrosCustos, valorHora };
+}
+function computeProcesso(p){
+  const asis = computeScenario(p.asis||{});
+  const tobe = computeScenario(p.tobe||{});
+  const custoImpl = (Number(p.impl?.dev)||0)+(Number(p.impl?.aquis)||0)+(Number(p.impl?.trein)||0)+(Number(p.impl?.outros)||0);
+  const manutAnual = (Number(p.impl?.manutencao)||0)*12;
+
+  const horasExecEcon = asis.horasExec - tobe.horasExec;
+  const horasMesEcon = asis.tempoMensal - tobe.tempoMensal;
+  const horasAnoEcon = asis.tempoAnual - tobe.tempoAnual;
+  const reducaoTempoPct = safeDiv(horasAnoEcon, asis.tempoAnual);
+  const econMensalMO = asis.custoMensalMO - tobe.custoMensalMO;
+  const econAnualMO = asis.custoAnualMO - tobe.custoAnualMO;
+  const reducaoOutrosCustosAnual = (asis.outrosCustos - tobe.outrosCustos)*12;
+  const economiaBrutaAnual = asis.custoAnualTotal - tobe.custoAnualTotal;
+  const economiaLiquida1Ano = economiaBrutaAnual - custoImpl - manutAnual;
+  const economiaLiquidaRecorrente = economiaBrutaAnual - manutAnual;
+  const reducaoCustoPct = safeDiv(economiaBrutaAnual, asis.custoAnualTotal);
+  const roi1Ano = safeDiv(economiaLiquida1Ano, custoImpl);
+  const paybackMeses = (custoImpl>0 && economiaLiquidaRecorrente>0) ? custoImpl/(economiaLiquidaRecorrente/12) : Infinity;
+  const valorAcum12 = economiaLiquidaRecorrente - custoImpl;
+  const valorAcum24 = economiaLiquidaRecorrente*2 - custoImpl;
+
+  return { asis, tobe, custoImpl, manutAnual, horasExecEcon, horasMesEcon, horasAnoEcon, reducaoTempoPct,
+    econMensalMO, econAnualMO, reducaoOutrosCustosAnual, economiaBrutaAnual, economiaLiquida1Ano,
+    economiaLiquidaRecorrente, reducaoCustoPct, roi1Ano, paybackMeses, valorAcum12, valorAcum24 };
+}
+function computeTracking(row, proc){
+  if(!proc || !proc.calc) return { previstasAntes:0, previstasDepois:0, horasReal:0, econHorasPrevista:0, econHorasRealizada:0, econFinPrevista:0, econFinRealizada:0, pctAtingimento:0, desvio:0 };
+  const previstasAntes = proc.calc.asis.tempoMensal;
+  const previstasDepois = proc.calc.tobe.tempoMensal;
+  const horasReal = Number(row.horasReal)||0;
+  const econHorasPrevista = previstasAntes - previstasDepois;
+  const econHorasRealizada = previstasAntes - horasReal;
+  const valorHora = proc.calc.asis.valorHora;
+  const econFinPrevista = econHorasPrevista*valorHora;
+  const econFinRealizada = econHorasRealizada*valorHora;
+  const pctAtingimento = safeDiv(econFinRealizada, econFinPrevista);
+  const desvio = econFinRealizada - econFinPrevista;
+  return { previstasAntes, previstasDepois, horasReal, econHorasPrevista, econHorasRealizada, econFinPrevista, econFinRealizada, pctAtingimento, desvio };
+}
+
+/* ============================================================
+   FORMATAÇÃO
+============================================================ */
+function isUserLoggedIn() {
+  return Boolean(state.user && state.user.email);
+}
+
+const fmtBRL = {
+  format: (v) => isUserLoggedIn() ? new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL",maximumFractionDigits:0}).format(v) : "🔒 R$ ••••••"
+};
+const fmtBRL1 = {
+  format: (v) => isUserLoggedIn() ? new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL",maximumFractionDigits:1}).format(v) : "🔒 R$ ••••••"
+};
+const fmtNum = new Intl.NumberFormat("pt-BR",{maximumFractionDigits:1});
+const fmtPct = (v)=> isUserLoggedIn() ? (v*100).toLocaleString("pt-BR",{maximumFractionDigits:1})+"%" : "🔒 •••%";
+function fmtHoras(v){ return isUserLoggedIn() ? fmtNum.format(v)+"h" : "🔒 •••h"; }
+function fmtPayback(v){ 
+  if(!isUserLoggedIn()) return "🔒 •• m";
+  return isFinite(v) && v>0 ? fmtNum.format(v)+" m" : "—"; 
+}
+function fmtCompactBRL(v){
+  if(!isUserLoggedIn()) return "🔒 R$ •••••";
+  if(Math.abs(v)>=1000) return "R$ "+(v/1000).toLocaleString("pt-BR",{maximumFractionDigits:0})+"k";
+  return "R$ "+v.toFixed(0);
+}
+
+/* ============================================================
+   DADOS-SEMENTE
+============================================================ */
+function seedProcessos(){
+  return [
+    { id:"proc-001", frente:"Manufatura", setor:"Manufatura - Produção", nome:"Apontamento de Produção",
+      responsavel:"Ana Souza", status:"Validado",
+      asis:{unidade:"Minutos",tempo:25,pessoas:2,freq:3,periodicidade:"Diária",valorHora:35,outrosCustos:150,retrabalho:0.08},
+      impl:{nome:"Apontamento Digital via Tablet",tipo:"Digitalização",dev:18000,aquis:6000,trein:2000,outros:1000,manutencao:300},
+      tobe:{unidade:"Minutos",tempo:6,pessoas:1,freq:3,periodicidade:"Diária",valorHora:35,outrosCustos:40,retrabalho:0.01},
+      validacao:"Validado", categoria:"Economia financeira realizada",
+      obs:"Validado com dados de 3 meses de operação.", isSeed:true },
+    { id:"proc-002", frente:"Manufatura", setor:"Manufatura - Qualidade", nome:"Inspeção de Qualidade Final",
+      responsavel:"Carla Menezes", status:"Implementado",
+      asis:{unidade:"Minutos",tempo:18,pessoas:1,freq:8,periodicidade:"Diária",valorHora:32,outrosCustos:80,retrabalho:0.12},
+      impl:{nome:"Padronização do Checklist Digital",tipo:"Padronização",dev:9000,aquis:0,trein:1200,outros:500,manutencao:150},
+      tobe:{unidade:"Minutos",tempo:10,pessoas:1,freq:8,periodicidade:"Diária",valorHora:32,outrosCustos:20,retrabalho:0.03},
+      validacao:"Em validação", categoria:"Capacidade operacional liberada",
+      obs:"Aguardando 2 meses adicionais de medição para validar retrabalho.", isSeed:true },
+    { id:"proc-003", frente:"Engenharia", setor:"Engenharia - Processos", nome:"Emissão de Relatório de Processo",
+      responsavel:"Diego Alves", status:"Validado",
+      asis:{unidade:"Horas",tempo:6,pessoas:1,freq:1,periodicidade:"Mensal",valorHora:55,outrosCustos:0,retrabalho:0.05},
+      impl:{nome:"Automação de Relatório com Power Query",tipo:"Automação",dev:15000,aquis:0,trein:800,outros:0,manutencao:100},
+      tobe:{unidade:"Horas",tempo:0.5,pessoas:1,freq:1,periodicidade:"Mensal",valorHora:55,outrosCustos:0,retrabalho:0},
+      validacao:"Validado", categoria:"Economia financeira realizada",
+      obs:"Economia validada em 6 meses de operação.", isSeed:true },
+    { id:"proc-004", frente:"Recursos Humanos", setor:"RH - Departamento Pessoal", nome:"Conferência de Ponto e Horas Extras",
+      responsavel:"Equipe de Melhoria Contínua", status:"Em desenvolvimento",
+      asis:{unidade:"Horas",tempo:10,pessoas:1,freq:1,periodicidade:"Mensal",valorHora:28,outrosCustos:0,retrabalho:0.15},
+      impl:{nome:"Integração Ponto x Folha",tipo:"Integração de sistemas",dev:25000,aquis:8000,trein:1000,outros:0,manutencao:150},
+      tobe:{unidade:"Horas",tempo:2,pessoas:1,freq:1,periodicidade:"Mensal",valorHora:28,outrosCustos:0,retrabalho:0.02},
+      validacao:"Não validado", categoria:"Economia financeira potencial",
+      obs:"Projeto ainda em desenvolvimento; valores são estimativas.", isSeed:true },
+    { id:"proc-005", frente:"Recursos Humanos", setor:"RH - Recrutamento e Seleção", nome:"Triagem de Currículos",
+      responsavel:"Ana Souza", status:"Planejado",
+      asis:{unidade:"Minutos",tempo:8,pessoas:1,freq:40,periodicidade:"Mensal",valorHora:30,outrosCustos:0,retrabalho:0.05},
+      impl:{nome:"Triagem Assistida por IA",tipo:"Inteligência artificial",dev:12000,aquis:4000,trein:600,outros:0,manutencao:80},
+      tobe:{unidade:"Minutos",tempo:2,pessoas:1,freq:40,periodicidade:"Mensal",valorHora:30,outrosCustos:0,retrabalho:0.02},
+      validacao:"Não validado", categoria:"Economia financeira potencial",
+      obs:"Projeto planejado; iniciar medição após entrada em operação.", isSeed:true }
+  ];
+}
+function seedAcompanhamentos(){
+  return [
+    { id:"tr-1", processoId:"proc-001", mes:"Abril", ano:2026, horasReal:5.8, evidencia:"Apontamento do sistema ERP", obs:"", isSeed:true },
+    { id:"tr-2", processoId:"proc-001", mes:"Maio", ano:2026, horasReal:5.5, evidencia:"Apontamento do sistema ERP", obs:"", isSeed:true },
+    { id:"tr-3", processoId:"proc-001", mes:"Junho", ano:2026, horasReal:5.2, evidencia:"Apontamento do sistema ERP", obs:"", isSeed:true },
+    { id:"tr-4", processoId:"proc-003", mes:"Janeiro", ano:2026, horasReal:0.6, evidencia:"Apontamento do sistema ERP", obs:"", isSeed:true },
+    { id:"tr-5", processoId:"proc-003", mes:"Fevereiro", ano:2026, horasReal:0.55, evidencia:"Apontamento do sistema ERP", obs:"", isSeed:true },
+    { id:"tr-6", processoId:"proc-003", mes:"Março", ano:2026, horasReal:0.5, evidencia:"Apontamento do sistema ERP", obs:"", isSeed:true }
+  ];
+}
+
+function defaultUserPermissions(){
+  return [
+    { email: "stephanierodrigues.090@ufrn.edu.br", role: "admin", areas: ["*"] },
+    { email: "stephanie.rodrigues.090@ufrn.edu.br", role: "admin", areas: ["*"] },
+    { email: "manufatura@gertec.com.br", role: "editor", areas: ["Manufatura"] },
+    { email: "engenharia@gertec.com.br", role: "editor", areas: ["Engenharia"] },
+    { email: "rh@gertec.com.br", role: "editor", areas: ["Recursos Humanos"] }
+  ];
+}
+
+/* ============================================================
+   ESTADO DA APLICAÇÃO
+============================================================ */
+const state = { 
+  processos:[], acomp:[], filters:{frente:"",setor:"",status:"",search:""}, 
+  procSort:"economia", user:null, guestMode:false, dbReady:false, editingTrackProcId:null, 
+  editingProcId:null, customFrentes:[], customSetores:{}, customStatus:[],
+  userPermissions: []
+};
+rebuildParamLists();
+
+function withCalc(list){ return list.map(p=>({ ...p, calc: computeProcesso(p) })); }
+function refreshCalcs(){ state.processos = withCalc(state.processos); render(); }
+
+/* ============================================================
+   PERSISTÊNCIA E CONEXÃO (SOMENTE A BOLINHA VERDE)
+============================================================ */
+function setLiveStatus(on){
+  state.dbReady = on;
+  const dot = document.getElementById("live-dot");
+  const container = document.getElementById("live-indicator-container");
+  if(dot) dot.classList.toggle("off", !on);
+  if(container) container.title = on ? "Conectado em tempo real" : "Modo local / offline";
+}
+
+function getUserPermission(email){
+  if(!email) return { role: "viewer", areas: ["*"] };
+  const lower = email.toLowerCase().trim();
+  const isAdminEmail = 
+    lower === "stephanierodrigues.090@ufrn.edu.br" || 
+    lower === "stephanie.rodrigues.090@ufrn.edu.br" || 
+    (lower.startsWith("stephanie") && lower.endsWith("@ufrn.edu.br"));
+
+  if(isAdminEmail) {
+    return { role: "admin", areas: ["*"] };
+  }
+  const found = state.userPermissions.find(u => (u.email||"").toLowerCase().trim() === lower);
+  return found || { role: "editor", areas: ["*"] };
+}
+
+function updateAuthUI(user){
+  state.user = user;
+  if(user && user.email){
+    try { localStorage.setItem("gertec_saved_user", JSON.stringify(user)); } catch(e){}
+    state.guestMode = false;
+  } else {
+    try { localStorage.removeItem("gertec_saved_user"); } catch(e){}
+  }
+
+  const appEl = document.getElementById("app");
+  const loginScreenView = document.getElementById("login-screen-view");
+  const openLoginBtn = document.getElementById("btn-open-login");
+  const userInfoBadge = document.getElementById("user-info-badge");
+  const userEmailDisplay = document.getElementById("user-email-display");
+  const adminBtn = document.getElementById("btn-admin-modal");
+
+  const isLoggedIn = isUserLoggedIn();
+  const isGuest = Boolean(state.guestMode);
+
+  if(isLoggedIn || isGuest){
+    if(appEl) appEl.hidden = false;
+    if(loginScreenView) loginScreenView.hidden = true;
+  } else {
+    if(appEl) appEl.hidden = true;
+    if(loginScreenView) loginScreenView.hidden = false;
+  }
+
+  if(isLoggedIn){
+    if(openLoginBtn) {
+      openLoginBtn.hidden = false;
+      openLoginBtn.textContent = "Trocar Conta";
+    }
+    if(userInfoBadge) userInfoBadge.hidden = false;
+    if(userEmailDisplay) userEmailDisplay.textContent = user.email;
+  } else {
+    if(openLoginBtn) {
+      openLoginBtn.hidden = false;
+      openLoginBtn.textContent = "🔐 Entrar";
+    }
+    if(userInfoBadge) userInfoBadge.hidden = true;
+  }
+
+  const perm = getUserPermission(user?.email);
+  const isAdmin = Boolean(isLoggedIn && perm.role === "admin");
+  if(adminBtn) adminBtn.hidden = !isAdmin;
+  
+  render();
+}
+
+async function initData(){
+  let localProcs = localStorage.getItem("gertec_processos");
+  let localAcomp = localStorage.getItem("gertec_acomp");
+  let localPerms = localStorage.getItem("gertec_user_permissions");
+  let localUser = localStorage.getItem("gertec_saved_user");
+
+  if(localPerms) {
+    try { state.userPermissions = JSON.parse(localPerms); } catch(e){}
+  }
+  if(!Array.isArray(state.userPermissions) || !state.userPermissions.length){
+    state.userPermissions = defaultUserPermissions();
+  }
+
+  if(localProcs) {
+    try { state.processos = withCalc(JSON.parse(localProcs)); } catch(e){}
+  }
+  if(!Array.isArray(state.processos) || !state.processos.length) {
+    state.processos = withCalc(seedProcessos());
+  }
+  if(localAcomp) {
+    try { state.acomp = JSON.parse(localAcomp); } catch(e){}
+  }
+  if(!Array.isArray(state.acomp) || !state.acomp.length) {
+    state.acomp = seedAcompanhamentos();
+  }
+  if(localUser) {
+    try { state.user = JSON.parse(localUser); } catch(e){}
+  }
+
+  setLiveStatus(false);
+  updateAuthUI(state.user);
+
+  initFirebase();
+}
+
+function saveLocalData(){
+  try {
+    const rawProcs = state.processos.map(({calc, ...p}) => p);
+    localStorage.setItem("gertec_processos", JSON.stringify(rawProcs));
+    localStorage.setItem("gertec_acomp", JSON.stringify(state.acomp));
+    localStorage.setItem("gertec_user_permissions", JSON.stringify(state.userPermissions));
+  } catch(e){}
+}
+
+function subscribeFirestoreData(){
+  if(!fbDb || !onSnapshot || !collection) return;
+  onSnapshot(collection(fbDb, "processos"), (snap) => {
+    if(!snap.empty) {
+      state.processos = withCalc(snap.docs.map(d=>({ id:d.id, ...d.data() })));
+      saveLocalData();
+      render();
+    }
+  }, (err)=>{});
+
+  onSnapshot(collection(fbDb, "acompanhamentos"), (snap) => {
+    if(!snap.empty) {
+      state.acomp = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+      saveLocalData();
+      render();
+    }
+  }, (err)=>{});
+
+  onSnapshot(collection(fbDb, "usuarios"), (snap) => {
+    if(!snap.empty) {
+      state.userPermissions = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+      saveLocalData();
+      renderAdminUsersTable();
+      render();
+    }
+  }, (err)=>{});
+}
+
+async function saveProcesso(p){
+  if(fbDb && fbAuth?.currentUser && addDoc && collection){
+    try{ 
+      const docRef = await addDoc(collection(fbDb, "processos"), p);
+      p.id = docRef.id;
+      showToast("Processo salvo!"); 
+      return; 
+    }catch(e){}
+  }
+  p.id = "local-"+Math.random().toString(36).slice(2,9);
+  state.processos.push({ ...p, calc: computeProcesso(p) });
+  saveLocalData();
+  showToast("Processo salvo localmente!");
+  render();
+}
+
+async function updateProcesso(id, data){
+  const existing = state.processos.find(p=>p.id===id);
+  const body = { ...data, isSeed: existing ? !!existing.isSeed : false };
+  if(fbDb && fbAuth?.currentUser && setDoc && doc && !id.startsWith("local-")){
+    try{ 
+      await setDoc(doc(fbDb, "processos", id), body, { merge:true }); 
+      showToast("Processo atualizado!"); 
+      return; 
+    }catch(e){}
+  }
+  state.processos = state.processos.map(p=> p.id===id ? { ...body, id, calc: computeProcesso(body) } : p);
+  saveLocalData();
+  showToast("Processo atualizado!");
+  render();
+}
+
+async function deleteProcesso(id){
+  if(fbDb && fbAuth?.currentUser && deleteDoc && doc && !id.startsWith("local-")){
+    try{ 
+      await deleteDoc(doc(fbDb, "processos", id)); 
+      showToast("Processo removido!"); 
+      return; 
+    }catch(e){}
+  }
+  state.processos = state.processos.filter(p=>p.id!==id);
+  saveLocalData();
+  showToast("Processo removido!");
+  render();
+}
+
+async function saveTracking(row){
+  if(fbDb && fbAuth?.currentUser && addDoc && collection){
+    try{ 
+      const docRef = await addDoc(collection(fbDb, "acompanhamentos"), row); 
+      row.id = docRef.id;
+      showToast("Acompanhamento registrado!"); 
+      return; 
+    }catch(e){}
+  }
+  row.id = "local-"+Math.random().toString(36).slice(2,9);
+  state.acomp.push(row);
+  saveLocalData();
+  showToast("Acompanhamento registrado!");
+  render();
+}
+
+/* Toast */
+function showToast(msg){
+  const el = document.getElementById("toast");
+  if(!el) return;
+  el.textContent = msg;
+  el.hidden = false;
+  setTimeout(()=>{ el.hidden = true; }, 3000);
+}
+
+/* ============================================================
+   FILTROS & PERMISSÕES
+============================================================ */
+function filteredProcessos(){
+  const f = state.filters;
+  const perm = getUserPermission(state.user?.email);
+
+  return state.processos.filter(p=>{
+    // Filtragem por permissão de usuário
+    if(perm.areas && !perm.areas.includes("*") && perm.role !== "admin"){
+      if(!perm.areas.includes(p.frente)) return false;
+    }
+    // Filtros de interface
+    if(f.frente && p.frente!==f.frente) return false;
+    if(f.setor && p.setor!==f.setor) return false;
+    if(f.status && p.status!==f.status) return false;
+    if(f.search){
+      const s = f.search.toLowerCase();
+      if(!(p.nome.toLowerCase().includes(s) || (p.responsavel||"").toLowerCase().includes(s))) return false;
+    }
+    return true;
+  });
+}
+
+/* ============================================================
+   RENDER — ABAS VISUAIS DE FRENTES
+============================================================ */
+function renderFrenteTabs(){
+  const container = document.getElementById("frente-tabs-bar");
+  if(!container) return;
+
+  const currentFrente = state.filters.frente;
+  const perm = getUserPermission(state.user?.email);
+  const allowedFrentes = FRENTES.filter(f => perm.areas.includes("*") || perm.role === "admin" || perm.areas.includes(f));
+
+  let tabsHtml = `<button class="frente-tab ${!currentFrente ? 'active' : ''}" data-frente="">
+    <span>Todas as Frentes</span>
+    <span class="frente-tab-count">${state.processos.length}</span>
+  </button>`;
+
+  allowedFrentes.forEach(f => {
+    const count = state.processos.filter(p => p.frente === f).length;
+    const isActive = currentFrente === f;
+    tabsHtml += `<button class="frente-tab ${isActive ? 'active' : ''}" data-frente="${f}">
+      <span>${f}</span>
+      <span class="frente-tab-count">${count}</span>
+    </button>`;
+  });
+
+  container.innerHTML = tabsHtml;
+
+  container.querySelectorAll(".frente-tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      const selectedFrente = tab.dataset.frente;
+      state.filters.frente = selectedFrente;
+      state.filters.setor = ""; 
+      
+      const fSel = document.getElementById("f-frente");
+      if(fSel) fSel.value = selectedFrente;
+      refreshFilterSetorOptions();
+      render();
+    });
+  });
+}
+
+/* ============================================================
+   RENDER — KPIs
+============================================================ */
+function sum(arr){ return arr.reduce((a,b)=>a+b,0); }
+function avg(arr){ return arr.length ? sum(arr)/arr.length : 0; }
+
+function computeAggregate(list){
+  const n = list.length;
+  const implementadas = list.filter(p=>STATUS_CONCLUIDO.has(p.status)).length;
+  const investimentoTotal = sum(list.map(p=>p.calc.custoImpl));
+  const economiaAnualPotencial = sum(list.map(p=>p.calc.economiaBrutaAnual));
+  const horasAno = sum(list.map(p=>p.calc.horasAnoEcon));
+  const horasMes = sum(list.map(p=>p.calc.horasMesEcon));
+  const roiConsolidado = safeDiv(sum(list.map(p=>p.calc.economiaLiquida1Ano)), investimentoTotal);
+  const paybacksFinitos = list.map(p=>p.calc.paybackMeses).filter(v=>isFinite(v));
+  const paybackMedio = avg(paybacksFinitos);
+  const reducaoMediaTempo = avg(list.map(p=>p.calc.reducaoTempoPct));
+  const reducaoMediaCusto = avg(list.map(p=>p.calc.reducaoCustoPct));
+  const pctConcluidas = n ? implementadas/n : 0;
+  return { n, implementadas, investimentoTotal, economiaAnualPotencial, economiaMensalPotencial:economiaAnualPotencial/12,
+    horasAno, horasMes, roiConsolidado, paybackMedio, reducaoMediaTempo, reducaoMediaCusto, pctConcluidas };
+}
+function economiaRealizadaTotal(){
+  const rows = state.acomp.map(r=>computeTracking(r, state.processos.find(p=>p.id===r.processoId))).filter(Boolean);
+  return { total: sum(rows.map(r=>r.econFinRealizada)), meses: rows.length };
+}
+
+function renderKPIs(list){
+  const agg = computeAggregate(list);
+  const real = economiaRealizadaTotal();
+  const grid = document.getElementById("kpi-grid");
+  if(!grid) return;
+  const roiClass = agg.roiConsolidado >= 0 ? "good" : "critical";
+  const roiIcon = agg.roiConsolidado >= 0 ? "▲" : "▼";
+  const tiles = [
+    { tag:"", label:"Processos cadastrados", value: fmtNum.format(agg.n), sub: agg.implementadas+" concluídas / validadas" },
+    { tag:"", label:"Investimento total", value: fmtBRL.format(agg.investimentoTotal), sub: "em "+agg.n+" iniciativas" },
+    { tag:"", label:"Economia potencial anual", value: fmtBRL.format(agg.economiaAnualPotencial), sub: fmtBRL.format(agg.economiaMensalPotencial)+" / mês" },
+    { tag:"", label:"Economia realizada (medida)", value: fmtBRL.format(real.total), sub: real.meses+" registros mensais" },
+    { tag:"", label:"Horas economizadas / ano", value: fmtHoras(agg.horasAno), sub: fmtHoras(agg.horasMes)+" / mês" },
+    { tag:roiIcon, label:"ROI consolidado", value: fmtPct(agg.roiConsolidado), sub: (agg.roiConsolidado>=0?"retorno positivo no 1º ano":"em recuperação"), subClass: roiClass },
+    { tag:"", label:"Payback médio", value: agg.paybackMedio? fmtNum.format(agg.paybackMedio)+" meses":"—", sub: "tempo para retorno" },
+    { tag:"", label:"Iniciativas concluídas", value: fmtPct(agg.pctConcluidas), sub: agg.implementadas+" de "+agg.n+" no filtro" }
+  ];
+  grid.innerHTML = tiles.map(t=>`
+    <div class="kpi">
+      ${t.tag ? `<span class="kpi-tag">${t.tag}</span>` : ''}
+      <div class="kpi-label">${t.label}</div>
+      <div class="kpi-value">${t.value}</div>
+      <div class="kpi-sub${t.subClass?(" "+t.subClass):""}">${t.sub}</div>
+    </div>`).join("");
+
+  const strip = document.getElementById("kpi-strip");
+  if(!strip) return;
+  const chips = [
+    { label:"Redução média de tempo de processo", value: fmtPct(agg.reducaoMediaTempo) },
+    { label:"Redução média de custo operacional", value: fmtPct(agg.reducaoMediaCusto) },
+    { label:"Capacidade operacional liberada / ano", value: fmtHoras(agg.horasAno) }
+  ];
+  strip.innerHTML = chips.map(c=>`
+    <div class="kpi-chip">
+      <div class="kpi-chip-text">
+        <span class="kpi-chip-val">${c.value}</span>
+        <span class="kpi-chip-label">${c.label}</span>
+      </div>
+    </div>`).join("");
+}
+
+/* ============================================================
+   TOOLTIP
+============================================================ */
+const tooltipEl = document.getElementById("tooltip");
+function showTooltip(evt, html){
+  if(!tooltipEl) return;
+  tooltipEl.innerHTML = html;
+  tooltipEl.hidden = false;
+  positionTooltip(evt);
+}
+function positionTooltip(evt){
+  if(!tooltipEl) return;
+  const pad = 14;
+  let x = evt.clientX + pad, y = evt.clientY + pad;
+  const rect = tooltipEl.getBoundingClientRect();
+  if(x + rect.width > window.innerWidth - 12) x = evt.clientX - rect.width - pad;
+  if(y + rect.height > window.innerHeight - 12) y = evt.clientY - rect.height - pad;
+  tooltipEl.style.left = x+"px";
+  tooltipEl.style.top = y+"px";
+}
+function hideTooltip(){ if(tooltipEl) tooltipEl.hidden = true; }
+
+/* ============================================================
+   GRÁFICOS SVG
+============================================================ */
+function emptySvgMsg(W,H,msg){ return `<text x="${W/2}" y="${H/2}" text-anchor="middle" font-size="13" fill="var(--ink-muted)">${msg}</text>`; }
+
+function renderScatter(list){
+  const svg = document.getElementById("chart-scatter");
+  if(!svg) return;
+  const W=860,H=380, ML=68,MR=24,MT=18,MB=44;
+  const plotW = W-ML-MR, plotH = H-MT-MB;
+  if(!list.length){ svg.innerHTML = emptySvgMsg(W,H,"Nenhum processo no filtro atual"); document.getElementById("legend-scatter").innerHTML=""; return; }
+
+  const xs = list.map(p=>p.calc.custoImpl);
+  const ys = list.map(p=>p.calc.economiaBrutaAnual);
+  const rs = list.map(p=>p.calc.horasAnoEcon);
+  const xMax = Math.max(...xs, 1) * 1.15;
+  const yMax = Math.max(...ys, 1) * 1.15;
+  const yMin = Math.min(0, ...ys) * 1.15;
+  const rMax = Math.max(...rs, 1);
+  const xScale = v => ML + (v/xMax)*plotW;
+  const yScale = v => MT + plotH - ((v-yMin)/(yMax-yMin||1))*plotH;
+  const rScale = v => 7 + Math.sqrt(Math.max(v,0)/rMax)*26;
+
+  let s = "";
+  const yTicks = 5;
+  for(let i=0;i<=yTicks;i++){
+    const val = yMin + (yMax-yMin)*i/yTicks;
+    const y = yScale(val);
+    s += `<line class="grid-line" x1="${ML}" x2="${W-MR}" y1="${y}" y2="${y}"/>`;
+    s += `<text x="${ML-10}" y="${y+4}" text-anchor="end" font-size="11">${fmtCompactBRL(val)}</text>`;
+  }
+  const xTicks = 5;
+  for(let i=0;i<=xTicks;i++){
+    const val = xMax*i/xTicks;
+    const x = xScale(val);
+    s += `<text x="${x}" y="${H-MB+22}" text-anchor="middle" font-size="11">${fmtCompactBRL(val)}</text>`;
+  }
+  s += `<line class="axis-line" x1="${ML}" x2="${W-MR}" y1="${H-MB}" y2="${H-MB}"/>`;
+  s += `<line class="axis-line" x1="${ML}" x2="${ML}" y1="${MT}" y2="${H-MB}"/>`;
+  s += `<text x="${ML+plotW/2}" y="${H-6}" text-anchor="middle" font-size="12" font-weight="600">Investimento (R$)</text>`;
+  s += `<text x="18" y="${MT+plotH/2}" text-anchor="middle" font-size="12" font-weight="600" transform="rotate(-90 18 ${MT+plotH/2})">Economia Bruta Anual (R$)</text>`;
+
+  if(xMax>0){
+    const p1x=ML, p1y=yScale(0);
+    const p2x=xScale(xMax), p2y=yScale(Math.min(xMax,yMax));
+    s += `<line x1="${p1x}" y1="${p1y}" x2="${p2x}" y2="${p2y}" stroke="var(--ink-muted)" stroke-width="1.2" stroke-dasharray="4 4" opacity=".6"/>`;
+    s += `<text x="${p2x-6}" y="${p2y-8}" text-anchor="end" font-size="10" fill="var(--ink-muted)">payback ≈ 12 meses</text>`;
+  }
+  s += `<line x1="${ML}" x2="${W-MR}" y1="${yScale(0)}" y2="${yScale(0)}" stroke="var(--ink-muted)" stroke-width="1"/>`;
+
+  list.forEach((p,i)=>{
+    const cx = xScale(p.calc.custoImpl), cy = yScale(p.calc.economiaBrutaAnual), r = rScale(p.calc.horasAnoEcon);
+    const color = frenteHex(p.frente);
+    s += `<circle data-i="${i}" cx="${cx}" cy="${cy}" r="${r}" fill="${color}" fill-opacity=".6" stroke="${color}" stroke-width="2" style="cursor:pointer;transition:transform 0.15s ease"/>`;
+  });
+  svg.innerHTML = s;
+
+  svg.querySelectorAll("circle").forEach(c=>{
+    const p = list[+c.dataset.i];
+    c.addEventListener("mousemove", (e)=>{
+      showTooltip(e, `<b>${p.nome}</b><br>
+        <div class="tt-row"><span>Investimento</span><b>${fmtBRL.format(p.calc.custoImpl)}</b></div>
+        <div class="tt-row"><span>Economia Bruta/Ano</span><b>${fmtBRL.format(p.calc.economiaBrutaAnual)}</b></div>
+        <div class="tt-row"><span>Horas Econ./Ano</span><b>${fmtHoras(p.calc.horasAnoEcon)}</b></div>
+        <div class="tt-row"><span>Payback</span><b>${fmtPayback(p.calc.paybackMeses)}</b></div>`);
+    });
+    c.addEventListener("mouseleave", hideTooltip);
+  });
+
+  const legendEl = document.getElementById("legend-scatter");
+  if(legendEl) {
+    legendEl.innerHTML = FRENTES.map(f=>`
+      <span class="legend-item"><span class="legend-swatch" style="background:${frenteHex(f)}"></span>${f}</span>`).join("")
+      + `<span class="legend-item" style="margin-left:12px"><span style="width:10px;height:10px;border-radius:50%;border:1.5px solid var(--ink-muted);display:inline-block"></span>tamanho = horas economizadas/ano</span>`;
+  }
+}
+
+function paybackStatus(v){
+  if(!isFinite(v) || v<=0) return {cls:"chip-muted", color:"var(--ink-muted)"};
+  if(v<=12) return {cls:"chip-good", color:"var(--good)"};
+  if(v<=24) return {cls:"chip-warning", color:"var(--warning)"};
+  return {cls:"chip-critical", color:"var(--critical)"};
+}
+
+function renderPaybackList(list){
+  const el = document.getElementById("chart-payback");
+  if(!el) return;
+  if(!list.length){ el.innerHTML = `<div class="empty-note">Nenhum processo no filtro atual.</div>`; return; }
+  const sorted = [...list].sort((a,b)=> (isFinite(a.calc.paybackMeses)?a.calc.paybackMeses:9e9) - (isFinite(b.calc.paybackMeses)?b.calc.paybackMeses:9e9));
+  const finiteMax = Math.max(...sorted.map(p=>isFinite(p.calc.paybackMeses)?p.calc.paybackMeses:0), 12);
+  el.innerHTML = sorted.map(p=>{
+    const v = p.calc.paybackMeses;
+    const st = paybackStatus(v);
+    const pct = isFinite(v) ? Math.min(100, (v/finiteMax)*100) : 100;
+    return `<div class="barlist-row" data-id="${p.id}">
+      <span class="rowlabel" title="${p.nome}"><span class="swatch" style="background:${frenteHex(p.frente)}"></span>${p.nome}</span>
+      <div class="barlist-track"><div class="barlist-fill" style="width:${pct}%;background:${st.color}"></div></div>
+      <span class="barlist-val">${fmtPayback(v)}</span>
+    </div>`;
+  }).join("");
+  el.querySelectorAll(".barlist-row").forEach(row=>{
+    const p = list.find(x=>x.id===row.dataset.id);
+    if(p) {
+      row.addEventListener("mousemove",(e)=> showTooltip(e, `<b>${p.nome}</b><br>
+        <div class="tt-row"><span>Payback</span><b>${fmtPayback(p.calc.paybackMeses)}</b></div>
+        <div class="tt-row"><span>Investimento</span><b>${fmtBRL.format(p.calc.custoImpl)}</b></div>
+        <div class="tt-row"><span>Economia Líquida/Ano</span><b>${fmtBRL.format(p.calc.economiaLiquidaRecorrente)}</b></div>`));
+      row.addEventListener("mouseleave", hideTooltip);
+    }
+  });
+}
+
+function renderFrenteChart(list){
+  const svg = document.getElementById("chart-frente");
+  if(!svg) return;
+  const data = FRENTES.map(f=>({ frente:f, valor: sum(list.filter(p=>p.frente===f).map(p=>p.calc.economiaBrutaAnual)) }));
+  const W=300,H=200, ML=10,MR=10,MT=14,MB=36;
+  const plotW=W-ML-MR, plotH=H-MT-MB;
+  const max = Math.max(...data.map(d=>d.valor),1)*1.15;
+  const bw = plotW/(data.length||1);
+  let s = "";
+  data.forEach((d,i)=>{
+    const h = max? (d.valor/max)*plotH : 0;
+    const x = ML + i*bw + bw*0.2;
+    const y = MT + plotH - h;
+    const w = bw*0.6;
+    const color = frenteHex(d.frente);
+    s += `<rect data-i="${i}" x="${x}" y="${y}" width="${w}" height="${Math.max(h,1)}" rx="6" fill="${color}" style="cursor:pointer"/>`;
+    s += `<text x="${x+w/2}" y="${y-6}" text-anchor="middle" font-size="11" font-weight="600" class="mono-text">${fmtCompactBRL(d.valor)}</text>`;
+    s += `<text x="${x+w/2}" y="${H-14}" text-anchor="middle" font-size="10" font-weight="500">${d.frente.replace("Recursos Humanos","RH")}</text>`;
+  });
+  s += `<line class="axis-line" x1="${ML}" x2="${W-MR}" y1="${MT+plotH}" y2="${MT+plotH}"/>`;
+  svg.innerHTML = s;
+  svg.querySelectorAll("rect").forEach(r=>{
+    const d = data[+r.dataset.i];
+    if(d){
+      r.addEventListener("mousemove",(e)=> showTooltip(e, `<b>${d.frente}</b><br><div class="tt-row"><span>Economia Bruta/Ano</span><b>${fmtBRL.format(d.valor)}</b></div>`));
+      r.addEventListener("mouseleave", hideTooltip);
+    }
+  });
+}
+
+function renderSetorList(list){
+  const el = document.getElementById("chart-setor");
+  if(!el) return;
+  const allSetores = Object.values(SETORES).flat();
+  const data = allSetores.map(setor=>{
+    const frente = Object.keys(SETORES).find(f=>SETORES[f].includes(setor));
+    return { setor, frente, valor: sum(list.filter(p=>p.setor===setor).map(p=>p.calc.economiaBrutaAnual)) };
+  }).filter(d=> list.some(p=>p.setor===d.setor) || d.valor>0).sort((a,b)=>b.valor-a.valor);
+  if(!data.length){ el.innerHTML = `<div class="empty-note">Nenhum processo no filtro atual.</div>`; return; }
+  const max = Math.max(...data.map(d=>d.valor),1);
+  el.innerHTML = data.map(d=>{
+    const pct = max ? Math.max((d.valor/max)*100, d.valor>0?4:0) : 0;
+    return `<div class="barlist-row">
+      <span class="rowlabel" title="${d.setor}"><span class="swatch" style="background:${frenteHex(d.frente)}"></span>${d.setor.replace(/^.*? - /,"")}</span>
+      <div class="barlist-track"><div class="barlist-fill" style="width:${pct}%;background:${frenteHex(d.frente)}"></div></div>
+      <span class="barlist-val">${fmtCompactBRL(d.valor)}</span>
+    </div>`;
+  }).join("");
+}
+
+const SEQ_BLUE = ["#dbeafe","#bfdbfe","#93c5fd","#60a5fa","#3b82f6","#2563eb","#1d4ed8","#1e40af","#1e3a8a"];
+function statusRamp(n){
+  const table = isDark() ? [...SEQ_BLUE].reverse() : SEQ_BLUE;
+  if(n<=1) return [table[Math.floor(table.length/2)]];
+  const steps = [];
+  for(let i=0;i<n;i++){ steps.push(table[Math.round(i*(table.length-1)/(n-1))]); }
+  return steps;
+}
+function renderStatusFunnel(list){
+  const el = document.getElementById("chart-status");
+  if(!el) return;
+  const order = statusOrder();
+  const ramp = statusRamp(order.length);
+  const counts = order.map(s=> list.filter(p=>p.status===s).length);
+  const suspenso = list.filter(p=>p.status==="Suspenso").length;
+  const max = Math.max(...counts, suspenso, 1);
+  let html = order.map((s,i)=>{
+    const c = counts[i];
+    const pct = Math.max((c/max)*100, c>0?5:0);
+    return `<div class="funnel-row">
+      <span class="funnel-label">${s}</span>
+      <div class="funnel-track"><div class="funnel-fill" style="width:${pct}%;background:${ramp[i]}"></div></div>
+      <span class="funnel-count">${c}</span>
+    </div>`;
+  }).join("");
+  if(suspenso>0){
+    const pct = Math.max((suspenso/max)*100,5);
+    html += `<div class="funnel-row" style="margin-top:6px">
+      <span class="funnel-label" style="color:var(--critical)">Suspenso</span>
+      <div class="funnel-track"><div class="funnel-fill" style="width:${pct}%;background:var(--critical)"></div></div>
+      <span class="funnel-count">${suspenso}</span>
+    </div>`;
+  }
+  el.innerHTML = html;
+}
+
+function monthKey(mes,ano){ return ano*100 + (MESES.indexOf(mes)+1); }
+function renderTrend(){
+  const svg = document.getElementById("chart-trend");
+  if(!svg) return;
+  const rows = state.acomp
+    .map(r=>({ r, calc: computeTracking(r, state.processos.find(p=>p.id===r.processoId)) }))
+    .filter(x=>x.calc);
+  if(!rows.length){ svg.innerHTML = emptySvgMsg(620,260,"Nenhum acompanhamento registrado ainda"); return; }
+
+  const byMonth = {};
+  rows.forEach(({r,calc})=>{
+    const k = monthKey(r.mes, r.ano);
+    if(!byMonth[k]) byMonth[k] = { label: r.mes.slice(0,3)+"/"+String(r.ano).slice(2), previsto:0, realizado:0 };
+    byMonth[k].previsto += calc.econFinPrevista;
+    byMonth[k].realizado += calc.econFinRealizada;
+  });
+  const keys = Object.keys(byMonth).sort((a,b)=>a-b);
+  const data = keys.map(k=>byMonth[k]);
+
+  const W=620,H=260, ML=64,MR=20,MT=18,MB=36;
+  const plotW=W-ML-MR, plotH=H-MT-MB;
+  const allVals = data.flatMap(d=>[d.previsto,d.realizado]);
+  const yMax = Math.max(...allVals,1)*1.2;
+  const yMin = Math.min(0,...allVals);
+  const xScale = i => data.length>1 ? ML + (i/(data.length-1))*plotW : ML+plotW/2;
+  const yScale = v => MT + plotH - ((v-yMin)/(yMax-yMin||1))*plotH;
+
+  let s = "";
+  const yTicks=4;
+  for(let i=0;i<=yTicks;i++){
+    const val = yMin + (yMax-yMin)*i/yTicks;
+    const y = yScale(val);
+    s += `<line class="grid-line" x1="${ML}" x2="${W-MR}" y1="${y}" y2="${y}"/>`;
+    s += `<text x="${ML-8}" y="${y+4}" text-anchor="end" font-size="10.5">${fmtCompactBRL(val)}</text>`;
+  }
+  data.forEach((d,i)=> s += `<text x="${xScale(i)}" y="${H-MB+20}" text-anchor="middle" font-size="10.5">${d.label}</text>`);
+
+  function path(key, close){
+    let d = data.map((pt,i)=> (i===0?"M":"L")+xScale(i)+","+yScale(pt[key])).join(" ");
+    if(close){ d += ` L${xScale(data.length-1)},${yScale(yMin)} L${xScale(0)},${yScale(yMin)} Z`; }
+    return d;
+  }
+  s += `<path d="${path('realizado',true)}" fill="var(--accent)" fill-opacity=".15" stroke="none"/>`;
+  s += `<path d="${path('previsto',false)}" fill="none" stroke="var(--ink-muted)" stroke-width="2" stroke-dasharray="5 4"/>`;
+  s += `<path d="${path('realizado',false)}" fill="none" stroke="var(--accent)" stroke-width="2.5"/>`;
+  data.forEach((d,i)=>{
+    s += `<circle data-i="${i}" cx="${xScale(i)}" cy="${yScale(d.previsto)}" r="9" fill="transparent" style="cursor:pointer"/>`;
+    s += `<circle cx="${xScale(i)}" cy="${yScale(d.previsto)}" r="3.5" fill="var(--surface)" stroke="var(--ink-muted)" stroke-width="2"/>`;
+    s += `<circle data-i="${i}" cx="${xScale(i)}" cy="${yScale(d.realizado)}" r="9" fill="transparent" style="cursor:pointer"/>`;
+    s += `<circle cx="${xScale(i)}" cy="${yScale(d.realizado)}" r="4" fill="var(--accent)"/>`;
+  });
+  s += `<line class="axis-line" x1="${ML}" x2="${W-MR}" y1="${MT+plotH}" y2="${MT+plotH}"/>`;
+  svg.innerHTML = s;
+
+  svg.querySelectorAll("circle[data-i]").forEach(c=>{
+    const d = data[+c.dataset.i];
+    if(d){
+      c.addEventListener("mousemove",(e)=>{
+        const ating = d.previsto ? (d.realizado/d.previsto*100) : 0;
+        showTooltip(e, `<b>${d.label}</b><br>
+          <div class="tt-row"><span>Previsto</span><b>${fmtBRL.format(d.previsto)}</b></div>
+          <div class="tt-row"><span>Realizado</span><b>${fmtBRL.format(d.realizado)}</b></div>
+          <div class="tt-row"><span>Atingimento</span><b>${ating.toFixed(0)}%</b></div>`);
+      });
+      c.addEventListener("mouseleave", hideTooltip);
+    }
+  });
+}
+
+/* ============================================================
+   CARDS DE PROCESSOS
+============================================================ */
+let openDetailIds = new Set();
+function sortProcessos(list){
+  const s = state.procSort;
+  const arr = [...list];
+  if(s==="economia") arr.sort((a,b)=>b.calc.economiaBrutaAnual-a.calc.economiaBrutaAnual);
+  else if(s==="roi") arr.sort((a,b)=>b.calc.roi1Ano-a.calc.roi1Ano);
+  else if(s==="payback") arr.sort((a,b)=>(isFinite(a.calc.paybackMeses)?a.calc.paybackMeses:9e9)-(isFinite(b.calc.paybackMeses)?b.calc.paybackMeses:9e9));
+  else if(s==="horas") arr.sort((a,b)=>b.calc.horasAnoEcon-a.calc.horasAnoEcon);
+  else if(s==="nome") arr.sort((a,b)=>a.nome.localeCompare(b.nome,"pt-BR"));
+  return arr;
+}
+function statusChipClass(status){
+  if(STATUS_CONCLUIDO.has(status)) return "chip-good";
+  if(status==="Suspenso") return "chip-critical";
+  if(["Em desenvolvimento","Em teste"].includes(status)) return "chip-warning";
+  return "chip-muted";
+}
+function renderProcCards(list){
+  const countEl = document.getElementById("count-procs");
+  if(countEl) countEl.textContent = list.length+" processo(s) exibido(s)";
+  const grid = document.getElementById("proc-grid");
+  if(!grid) return;
+  const sorted = sortProcessos(list);
+  if(!sorted.length){ grid.innerHTML = `<div class="empty-note">Nenhum processo corresponde aos filtros selecionados.</div>`; return; }
+
+  const perm = getUserPermission(state.user?.email);
+
+  grid.innerHTML = sorted.map(p=>{
+    const c = p.calc;
+    const roiCls = c.roi1Ano>=0 ? "good" : "critical";
+    const isOpen = openDetailIds.has(p.id);
+    const tracks = state.acomp.filter(t=>t.processoId===p.id).sort((a,b)=>monthKey(a.mes,a.ano)-monthKey(b.mes,b.ano));
+    const asisBarMax = Math.max(p.calc.asis.custoAnualTotal, p.calc.tobe.custoAnualTotal, 1);
+    const canEdit = perm.role === "admin" || perm.role === "editor";
+
+    return `<div class="proc-card" data-id="${p.id}">
+      <div class="proc-card-top">
+        <div>
+          <div class="proc-name">${p.nome}</div>
+          <div class="proc-chips">
+            <span class="chip" style="background:${frenteHex(p.frente)}22;color:${frenteHex(p.frente)}"><span class="chip-dot" style="background:currentColor"></span>${p.frente}</span>
+            <span class="chip chip-muted">${(p.setor||'').replace(/^.*? - /,"")}</span>
+            <span class="chip ${statusChipClass(p.status)}">${p.status}</span>
+          </div>
+        </div>
+        ${canEdit ? `<div class="proc-icon-actions">
+          <button class="btn btn-ghost btn-sm edit-btn" data-id="${p.id}" title="Editar processo">✎ Editar</button>
+          <button class="btn btn-danger btn-sm del-btn" data-id="${p.id}" title="Excluir processo">✕</button>
+        </div>` : ''}
+      </div>
+      <div class="proc-stats">
+        <div><div class="proc-stat-label">Economia/ano</div><div class="proc-stat-val">${fmtCompactBRL(c.economiaBrutaAnual)}</div></div>
+        <div><div class="proc-stat-label">ROI 1º ano</div><div class="proc-stat-val" style="color:var(--${roiCls})">${fmtPct(c.roi1Ano)}</div></div>
+        <div><div class="proc-stat-label">Payback</div><div class="proc-stat-val">${fmtPayback(c.paybackMeses)}</div></div>
+      </div>
+      <div class="proc-actions">
+        <button class="btn btn-ghost btn-sm toggle-btn" data-id="${p.id}">${isOpen?"Ocultar detalhes ▲":"Ver detalhes ▼"}</button>
+        ${canEdit ? `<button class="btn btn-ghost btn-sm track-btn" data-id="${p.id}">+ Registrar mês</button>` : ''}
+      </div>
+      <div class="proc-detail ${isOpen?'open':''}">
+        <div class="compare-row">
+          <span class="compare-label">Tempo/exec.</span>
+          <div class="compare-bar-wrap">
+            <div class="compare-bar-track"><div class="compare-bar-fill asis" style="width:${pct(c.asis.horasExec,Math.max(c.asis.horasExec,c.tobe.horasExec,0.001))}%"></div></div>
+            <span class="compare-val">${fmtNum.format(c.asis.horasExec)}h → ${fmtNum.format(c.tobe.horasExec)}h</span>
+          </div>
+        </div>
+        <div class="compare-row">
+          <span class="compare-label">Custo Anual</span>
+          <div class="compare-bar-wrap">
+            <div class="compare-bar-track"><div class="compare-bar-fill tobe" style="width:${pct(c.tobe.custoAnualTotal,asisBarMax)}%"></div></div>
+            <span class="compare-val">${fmtCompactBRL(c.asis.custoAnualTotal)} → ${fmtCompactBRL(c.tobe.custoAnualTotal)}</span>
+          </div>
+        </div>
+        <div class="legend" style="margin-top:4px">
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--ink-muted)"></span>AS-IS (Anterior)</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--accent)"></span>TO-BE (Novo)</span>
+        </div>
+        <table class="track-table">
+          <thead><tr><th>Mês</th><th>Horas Real.</th><th>Econ. Prevista</th><th>Econ. Realizada</th><th>Ating.</th></tr></thead>
+          <tbody>
+          ${tracks.length? tracks.map(t=>{
+            const tc = computeTracking(t, p);
+            const atingCls = tc.pctAtingimento>=1 ? "good" : (tc.pctAtingimento>=0.85?"warning":"critical");
+            return `<tr><td>${t.mes.slice(0,3)}/${t.ano}</td><td>${fmtNum.format(tc.horasReal)}h</td><td>${fmtCompactBRL(tc.econFinPrevista)}</td><td>${fmtCompactBRL(tc.econFinRealizada)}</td><td style="color:var(--${atingCls})">${(tc.pctAtingimento*100).toFixed(0)}%</td></tr>`;
+          }).join("") : `<tr><td colspan="5" style="color:var(--ink-muted);font-family:'IBM Plex Sans',sans-serif">Sem acompanhamento mensal ainda.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join("");
+
+  grid.querySelectorAll(".toggle-btn").forEach(b=> b.addEventListener("click",()=>{
+    const id=b.dataset.id;
+    if(openDetailIds.has(id)) openDetailIds.delete(id); else openDetailIds.add(id);
+    renderProcCards(filteredProcessos());
+  }));
+  grid.querySelectorAll(".track-btn").forEach(b=> b.addEventListener("click",()=> openTrackModal(b.dataset.id)));
+  grid.querySelectorAll(".edit-btn").forEach(b=> b.addEventListener("click",()=>{
+    const p = state.processos.find(x=>x.id===b.dataset.id);
+    if(p) openWizardForEdit(p);
+  }));
+  grid.querySelectorAll(".del-btn").forEach(b=> b.addEventListener("click",()=>{
+    const p = state.processos.find(x=>x.id===b.dataset.id);
+    if(confirm(`Excluir o processo "${p?p.nome:''}"? Esta ação não pode ser desfeita.`)) deleteProcesso(b.dataset.id);
+  }));
+}
+function pct(v,max){ return max? Math.min(100,(v/max)*100) : 0; }
+
+/* ============================================================
+   EXPORT CSV
+============================================================ */
+function exportCSV(){
+  if(!isUserLoggedIn()){
+    alert("🔒 Para exportar os dados financeiros dos projetos, por favor faça login com seu e-mail.");
+    const openLoginBtn = document.getElementById("btn-open-login");
+    if(openLoginBtn) openLoginBtn.click();
+    return;
+  }
+  const list = filteredProcessos();
+  if(!list.length){ alert("Nenhum processo para exportar."); return; }
+  
+  let csv = "ID;Frente;Setor;Nome do Processo;Responsavel;Status;Custo Implantacao (R$);Economia Anual Bruta (R$);Horas Economizadas Anual;Payback (Meses);ROI 1 Ano (%)\n";
+  list.forEach(p => {
+    const c = p.calc;
+    csv += `"${p.id}";"${p.frente}";"${p.setor}";"${p.nome}";"${p.responsavel||''}";"${p.status}";${c.custoImpl};${c.economiaBrutaAnual};${c.horasAnoEcon.toFixed(1)};${isFinite(c.paybackMeses)?c.paybackMeses.toFixed(1):'N/A'};${(c.roi1Ano*100).toFixed(1)}\n`;
+  });
+  
+  const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", `melhorias_gertec_${new Date().toISOString().slice(0,10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  showToast("Relatório CSV exportado!");
+}
+
+/* ============================================================
+   FILTROS UI
+============================================================ */
+function refreshFilterSetorOptions(){
+  const fSel = document.getElementById("f-frente");
+  const sSel = document.getElementById("f-setor");
+  if(!fSel || !sSel) return;
+  const f = fSel.value;
+  const opts = f ? (SETORES[f]||[]) : Object.values(SETORES).flat();
+  const keep = sSel.value;
+  sSel.innerHTML = `<option value="">Todos os setores</option>` + opts.map(s=>`<option value="${s}">${s.replace(/^.*? - /,"")}</option>`).join("");
+  if(opts.includes(keep)) sSel.value = keep; else { sSel.value=""; state.filters.setor=""; }
+}
+function refreshFilterOptions(){
+  const fSel = document.getElementById("f-frente");
+  const stSel = document.getElementById("f-status");
+  if(!fSel || !stSel) return;
+  const keepF = fSel.value, keepSt = stSel.value;
+  fSel.innerHTML = `<option value="">Todas as frentes</option>` + FRENTES.map(f=>`<option value="${f}">${f}</option>`).join("");
+  fSel.value = FRENTES.includes(keepF) ? keepF : "";
+  stSel.innerHTML = `<option value="">Todos os status</option>` + STATUS_INICIATIVA.map(s=>`<option value="${s}">${s}</option>`).join("");
+  stSel.value = STATUS_INICIATIVA.includes(keepSt) ? keepSt : "";
+  refreshFilterSetorOptions();
+}
+function populateFilterSelects(){
+  refreshFilterOptions();
+  const fSel = document.getElementById("f-frente");
+  const sSel = document.getElementById("f-setor");
+  const stSel = document.getElementById("f-status");
+  const searchInput = document.getElementById("f-search");
+  const clearBtn = document.getElementById("f-clear");
+  const sortSel = document.getElementById("proc-sort");
+
+  if(fSel) fSel.addEventListener("change",()=>{ 
+    state.filters.frente=fSel.value; 
+    state.filters.setor=""; 
+    refreshFilterSetorOptions(); 
+    render(); 
+  });
+  if(sSel) sSel.addEventListener("change",()=>{ state.filters.setor=sSel.value; render(); });
+  if(stSel) stSel.addEventListener("change",()=>{ state.filters.status=stSel.value; render(); });
+  if(searchInput) searchInput.addEventListener("input",(e)=>{ state.filters.search=e.target.value; render(); });
+  if(clearBtn) clearBtn.addEventListener("click",()=>{
+    state.filters={frente:"",setor:"",status:"",search:""};
+    if(fSel) fSel.value=""; 
+    refreshFilterSetorOptions(); 
+    if(sSel) sSel.value=""; 
+    if(stSel) stSel.value=""; 
+    if(searchInput) searchInput.value="";
+    render();
+  });
+  if(sortSel) sortSel.addEventListener("change",(e)=>{ state.procSort=e.target.value; renderProcCards(filteredProcessos()); });
+}
+
+/* ============================================================
+   TEMA
+============================================================ */
+function initTheme(){
+  const btn = document.getElementById("btn-theme");
+  const landingBtn = document.getElementById("btn-landing-theme");
+  const saved = localStorage.getItem("gertec_theme");
+
+  function syncButtons(themeName){
+    const label = themeName === "dark" ? "☀️ Tema" : "🌙 Tema";
+    if(btn) btn.textContent = label;
+    if(landingBtn) landingBtn.textContent = label;
+  }
+
+  if(saved){
+    document.documentElement.setAttribute("data-theme", saved);
+    syncButtons(saved);
+  }
+
+  const toggleHandler = ()=>{
+    const current = document.documentElement.getAttribute("data-theme") || (isDark() ? "dark" : "light");
+    const next = current === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem("gertec_theme", next);
+    syncButtons(next);
+    render();
+  };
+
+  if(btn) btn.addEventListener("click", toggleHandler);
+  if(landingBtn) landingBtn.addEventListener("click", toggleHandler);
+}
+
+function renderGuestBanner(){
+  let banner = document.getElementById("guest-lock-banner");
+  const main = document.querySelector("main");
+  if(!main) return;
+
+  if(!isUserLoggedIn()){
+    if(!banner){
+      banner = document.createElement("div");
+      banner.id = "guest-lock-banner";
+      banner.className = "banner";
+      banner.style.cssText = "background:var(--accent-wash);color:var(--accent);border:1px solid var(--accent-wash-strong);margin-bottom:20px;padding:14px 20px;border-radius:12px;display:flex;align-items:center;justify-content:space-between;gap:16px;box-shadow:var(--shadow);";
+      banner.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px">
+          <div>
+            <strong style="font-size:14px;display:block">Dados Financeiros Protegidos</strong>
+            <span style="font-size:12.5px;color:var(--ink-secondary)">Faça login com seu e-mail para desbloquear os dados de investimentos, economia e indicadores dos projetos Gertec.</span>
+          </div>
+        </div>
+        <button class="btn btn-accent btn-sm" id="guest-banner-login-btn" style="flex:none">🔐 Entrar com E-mail</button>
+      `;
+      main.insertBefore(banner, main.firstChild);
+      const loginBtn = document.getElementById("guest-banner-login-btn");
+      if(loginBtn) loginBtn.addEventListener("click", ()=> {
+        state.guestMode = false;
+        state.user = null;
+        updateAuthUI(null);
+      });
+    } else {
+      banner.hidden = false;
+    }
+  } else {
+    if(banner) banner.hidden = true;
+  }
+}
+
+/* ============================================================
+   RENDER PRINCIPAL
+============================================================ */
+function render(){
+  renderGuestBanner();
+  renderFrenteTabs();
+  const list = filteredProcessos();
+  renderKPIs(list);
+  renderScatter(list);
+  renderPaybackList(list);
+  renderFrenteChart(list);
+  renderSetorList(list);
+  renderStatusFunnel(list);
+  renderTrend();
+  renderProcCards(list);
+}
+
+/* ============================================================
+   AUTENTICAÇÃO & TELA INICIAL DE LOGIN
+============================================================ */
+let isSignUpMode = false;
+function wireAuthModal(){
+  const openLoginBtn = document.getElementById("btn-open-login");
+  const tabLogin = document.getElementById("tab-login-mode");
+  const tabSignup = document.getElementById("tab-signup-mode");
+  const authForm = document.getElementById("auth-form");
+  const authSubmitBtn = document.getElementById("auth-submit-btn");
+  const googleBtn = document.getElementById("btn-google-login");
+  const guestBtn = document.getElementById("btn-guest-mode");
+  const logoutBtn = document.getElementById("btn-logout");
+  const banner = document.getElementById("login-banner");
+  const bannerText = document.getElementById("login-banner-text");
+
+  if(openLoginBtn){
+    openLoginBtn.addEventListener("click", ()=>{
+      state.guestMode = false;
+      state.user = null;
+      updateAuthUI(null);
+    });
+  }
+
+  if(guestBtn){
+    guestBtn.addEventListener("click", ()=>{
+      state.guestMode = true;
+      updateAuthUI(null);
+    });
+  }
+
+  if(tabLogin && tabSignup){
+    tabLogin.addEventListener("click", ()=>{
+      isSignUpMode = false;
+      tabLogin.classList.add("active");
+      tabLogin.style.borderBottom = "2px solid var(--accent)";
+      tabLogin.style.color = "var(--accent)";
+      tabSignup.classList.remove("active");
+      tabSignup.style.borderBottom = "none";
+      tabSignup.style.color = "var(--ink-secondary)";
+      if(authSubmitBtn) authSubmitBtn.textContent = "Entrar com E-mail";
+      if(banner) banner.hidden = true;
+    });
+    tabSignup.addEventListener("click", ()=>{
+      isSignUpMode = true;
+      tabSignup.classList.add("active");
+      tabSignup.style.borderBottom = "2px solid var(--accent)";
+      tabSignup.style.color = "var(--accent)";
+      tabLogin.classList.remove("active");
+      tabLogin.style.borderBottom = "none";
+      tabLogin.style.color = "var(--ink-secondary)";
+      if(authSubmitBtn) authSubmitBtn.textContent = "Criar Conta";
+      if(banner) banner.hidden = true;
+    });
+  }
+
+  async function performLogin(){
+    const emailInput = document.getElementById("auth-email");
+    const passwordInput = document.getElementById("auth-password");
+    const email = emailInput ? emailInput.value.trim() : "";
+    const password = passwordInput ? passwordInput.value : "";
+
+    if(!email){
+      if(bannerText) bannerText.textContent = "Por favor, informe seu e-mail de acesso.";
+      if(banner) banner.hidden = false;
+      return;
+    }
+
+    const pass = password || "123456";
+
+    if(fbAuth && signInWithEmailAndPassword && createUserWithEmailAndPassword){
+      try {
+        if(isSignUpMode){
+          const res = await createUserWithEmailAndPassword(fbAuth, email, pass);
+          updateAuthUI(res.user);
+        } else {
+          try {
+            const res = await signInWithEmailAndPassword(fbAuth, email, pass);
+            updateAuthUI(res.user);
+          } catch(authErr) {
+            try {
+              const resCreate = await createUserWithEmailAndPassword(fbAuth, email, pass);
+              updateAuthUI(resCreate.user);
+            } catch(createErr) {
+              updateAuthUI({ email: email, displayName: email.split("@")[0] });
+            }
+          }
+        }
+      } catch(err) {
+        updateAuthUI({ email: email, displayName: email.split("@")[0] });
+      }
+    } else {
+      updateAuthUI({ email: email, displayName: email.split("@")[0] });
+    }
+
+    showToast("Login realizado com sucesso!");
+  }
+
+  if(authSubmitBtn) authSubmitBtn.addEventListener("click", performLogin);
+  if(authForm) authForm.addEventListener("submit", (e)=>{ e.preventDefault(); performLogin(); });
+
+  if(googleBtn){
+    googleBtn.addEventListener("click", async ()=>{
+      try {
+        if(!fbAuth) throw new Error("Firebase Auth não configurado.");
+        const provider = new GoogleAuthProvider();
+        const res = await signInWithPopup(fbAuth, provider);
+        updateAuthUI(res.user);
+        showToast("Login Google realizado!");
+      } catch(err) {
+        updateAuthUI({ email: "google.user@gertec.com.br", displayName: "Usuário Google" });
+        showToast("Sessão iniciada!");
+      }
+    });
+  }
+
+  if(logoutBtn){
+    logoutBtn.addEventListener("click", async ()=>{
+      state.guestMode = false;
+      if(fbAuth) {
+        try { await signOut(fbAuth); } catch(e){}
+      }
+      updateAuthUI(null);
+      showToast("Sessão encerrada.");
+    });
+  }
+}
+
+/* ============================================================
+   PAINEL DE ADMINISTRAÇÃO & PERMISSÕES POR E-MAIL
+============================================================ */
+function renderAdminUsersTable(){
+  const tbody = document.getElementById("adm-users-tbody");
+  if(!tbody) return;
+
+  tbody.innerHTML = state.userPermissions.map((u, idx) => {
+    const roleLabel = u.role === "admin" ? "Admin" : u.role === "editor" ? "Editor" : "Leitor";
+    const areasLabel = u.areas && u.areas.includes("*") ? "Todas as Frentes (*)" : (u.areas||[]).join(", ");
+    return `<tr>
+      <td style="font-weight:600">${u.email}</td>
+      <td>${roleLabel}</td>
+      <td>${areasLabel}</td>
+      <td>
+        <button class="btn btn-danger btn-sm adm-del-user" data-idx="${idx}">Excluir</button>
+      </td>
+    </tr>`;
+  }).join("");
+
+  tbody.querySelectorAll(".adm-del-user").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = +btn.dataset.idx;
+      state.userPermissions.splice(idx, 1);
+      saveLocalData();
+      renderAdminUsersTable();
+      showToast("Permissão de usuário removida!");
+      render();
+    });
+  });
+}
+
+function renderAdminFrentesOptions(){
+  const select = document.getElementById("adm-user-frentes");
+  if(!select) return;
+  select.innerHTML = `<option value="*" selected>Todas as Frentes (*)</option>` + 
+    FRENTES.map(f => `<option value="${f}">${f}</option>`).join("");
+}
+
+function wireAdminModal(){
+  const adminBtn = document.getElementById("btn-admin-modal");
+  const overlay = document.getElementById("admin-overlay");
+  const closeBtn = document.getElementById("admin-close");
+  const cancelBtn = document.getElementById("admin-cancel");
+  const tabUsers = document.getElementById("tab-adm-users");
+  const tabParams = document.getElementById("tab-adm-params");
+  const secUsers = document.getElementById("adm-sec-users");
+  const secParams = document.getElementById("adm-sec-params");
+  const saveUserBtn = document.getElementById("adm-save-user-btn");
+
+  function openAdminModal(){
+    renderAdminFrentesOptions();
+    renderAdminUsersTable();
+    if(overlay) overlay.hidden = false;
+  }
+  function closeAdminModal(){
+    if(overlay) overlay.hidden = true;
+  }
+
+  if(adminBtn) adminBtn.addEventListener("click", openAdminModal);
+  if(closeBtn) closeBtn.addEventListener("click", closeAdminModal);
+  if(cancelBtn) cancelBtn.addEventListener("click", closeAdminModal);
+  if(overlay) overlay.addEventListener("click", (e)=>{ if(e.target.id==="admin-overlay") closeAdminModal(); });
+
+  if(tabUsers && tabParams){
+    tabUsers.addEventListener("click", ()=>{
+      tabUsers.classList.add("active");
+      tabUsers.style.borderBottom = "2px solid var(--accent)";
+      tabUsers.style.color = "var(--accent)";
+      tabParams.classList.remove("active");
+      tabParams.style.borderBottom = "none";
+      tabParams.style.color = "var(--ink-secondary)";
+      if(secUsers) secUsers.hidden = false;
+      if(secParams) secParams.hidden = true;
+    });
+
+    tabParams.addEventListener("click", ()=>{
+      tabParams.classList.add("active");
+      tabParams.style.borderBottom = "2px solid var(--accent)";
+      tabParams.style.color = "var(--accent)";
+      tabUsers.classList.remove("active");
+      tabUsers.style.borderBottom = "none";
+      tabUsers.style.color = "var(--ink-secondary)";
+      if(secUsers) secUsers.hidden = true;
+      if(secParams) secParams.hidden = false;
+    });
+  }
+
+  if(saveUserBtn){
+    saveUserBtn.addEventListener("click", async ()=>{
+      const emailInput = document.getElementById("adm-user-email");
+      const roleSelect = document.getElementById("adm-user-role");
+      const frentesSelect = document.getElementById("adm-user-frentes");
+      const email = emailInput?.value.trim();
+
+      if(!email){
+        alert("Informe o e-mail do usuário.");
+        return;
+      }
+
+      const selectedAreas = Array.from(frentesSelect.selectedOptions).map(o => o.value);
+      const role = roleSelect?.value || "viewer";
+
+      const existingIdx = state.userPermissions.findIndex(u => (u.email||"").toLowerCase() === email.toLowerCase());
+      const userData = { email, role, areas: selectedAreas.length ? selectedAreas : ["*"] };
+
+      if(existingIdx >= 0){
+        state.userPermissions[existingIdx] = userData;
+      } else {
+        state.userPermissions.push(userData);
+      }
+
+      if(fbDb && fbAuth?.currentUser && setDoc && doc){
+        try {
+          await setDoc(doc(fbDb, "usuarios", email.replace(/\./g, "_")), userData, { merge:true });
+        } catch(e){}
+      }
+
+      saveLocalData();
+      renderAdminUsersTable();
+      if(emailInput) emailInput.value = "";
+      showToast("Permissão salva para " + email);
+      render();
+    });
+  }
+}
+
+/* ============================================================
+   WIZARD MODAL
+============================================================ */
+function fillSelect(id, options, selected){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.innerHTML = options.map(o=>`<option value="${o}" ${o===selected?"selected":""}>${o}</option>`).join("");
+}
+function initWizardStatic(){
+  fillSelect("w-frente", FRENTES, FRENTES[0]);
+  fillSelect("w-setor", SETORES[FRENTES[0]] || []);
+  fillSelect("w-status", STATUS_INICIATIVA, "Planejado");
+  fillSelect("w-asis-unidade", UNIDADES_TEMPO, "Minutos");
+  fillSelect("w-asis-periodicidade", PERIODICIDADES, "Diária");
+  fillSelect("w-melhoria-tipo", TIPOS_MELHORIA, TIPOS_MELHORIA[0]);
+  fillSelect("w-tobe-periodicidade", PERIODICIDADES, "Diária");
+  fillSelect("w-validacao", STATUS_VALIDACAO, "Não validado");
+  fillSelect("w-categoria", CATEGORIAS_BENEFICIO, "Economia financeira potencial");
+}
+function readWizardForm(){
+  const num = id => Number(document.getElementById(id)?.value)||0;
+  const val = id => (document.getElementById(id)?.value||"");
+  return {
+    frente: val("w-frente"), setor: val("w-setor"), nome: val("w-nome").trim(),
+    responsavel: val("w-responsavel").trim(), status: val("w-status"),
+    asis: { unidade:val("w-asis-unidade"), tempo:num("w-asis-tempo"), pessoas:num("w-asis-pessoas"),
+      freq:num("w-asis-freq"), periodicidade:val("w-asis-periodicidade"), valorHora:num("w-asis-valorhora"),
+      outrosCustos:num("w-asis-outros"), retrabalho:num("w-asis-retrabalho")/100 },
+    impl: { nome:val("w-melhoria-nome").trim(), tipo:val("w-melhoria-tipo"), dev:num("w-impl-dev"),
+      aquis:num("w-impl-aquis"), trein:num("w-impl-trein"), outros:num("w-impl-outros"), manutencao:num("w-impl-manutencao") },
+    tobe: { unidade:val("w-asis-unidade"), tempo:num("w-tobe-tempo"), pessoas:num("w-tobe-pessoas"),
+      freq:num("w-tobe-freq"), periodicidade:val("w-tobe-periodicidade")||val("w-asis-periodicidade"),
+      valorHora: num("w-tobe-valorhora")||num("w-asis-valorhora"), outrosCustos:num("w-tobe-outros"), retrabalho:num("w-tobe-retrabalho")/100 },
+    validacao: val("w-validacao"), categoria: val("w-categoria"), obs: val("w-obs").trim()
+  };
+}
+function updateWizardPreview(){
+  const data = readWizardForm();
+  const calc = computeProcesso(data);
+  const el = document.getElementById("wizard-preview");
+  if(!el) return;
+  const roiCls = calc.roi1Ano>=0 ? "good":"critical";
+  el.innerHTML = `
+    <div class="preview-item"><span class="l">Economia Anual</span><span class="v">${fmtBRL.format(calc.economiaBrutaAnual)}</span></div>
+    <div class="preview-item"><span class="l">Horas Econ./Ano</span><span class="v">${fmtHoras(calc.horasAnoEcon)}</span></div>
+    <div class="preview-item"><span class="l">ROI 1º Ano</span><span class="v" style="color:var(--${roiCls})">${fmtPct(calc.roi1Ano)}</span></div>
+    <div class="preview-item"><span class="l">Payback</span><span class="v">${fmtPayback(calc.paybackMeses)}</span></div>
+    <div class="preview-item"><span class="l">Investimento</span><span class="v">${fmtBRL.format(calc.custoImpl)}</span></div>`;
+}
+function fillWizardForm(p){
+  fillSelect("w-frente", FRENTES, p.frente);
+  fillSelect("w-setor", SETORES[p.frente] || [], p.setor);
+  if(document.getElementById("w-nome")) document.getElementById("w-nome").value = p.nome || "";
+  if(document.getElementById("w-responsavel")) document.getElementById("w-responsavel").value = p.responsavel || "";
+  fillSelect("w-status", STATUS_INICIATIVA, p.status);
+  fillSelect("w-asis-unidade", UNIDADES_TEMPO, p.asis?.unidade);
+  if(document.getElementById("w-asis-tempo")) document.getElementById("w-asis-tempo").value = p.asis?.tempo || 0;
+  if(document.getElementById("w-asis-pessoas")) document.getElementById("w-asis-pessoas").value = p.asis?.pessoas || 1;
+  if(document.getElementById("w-asis-freq")) document.getElementById("w-asis-freq").value = p.asis?.freq || 0;
+  fillSelect("w-asis-periodicidade", PERIODICIDADES, p.asis?.periodicidade);
+  if(document.getElementById("w-asis-valorhora")) document.getElementById("w-asis-valorhora").value = p.asis?.valorHora || 0;
+  if(document.getElementById("w-asis-outros")) document.getElementById("w-asis-outros").value = p.asis?.outrosCustos || 0;
+  if(document.getElementById("w-asis-retrabalho")) document.getElementById("w-asis-retrabalho").value = Math.round((p.asis?.retrabalho||0)*1000)/10;
+  if(document.getElementById("w-melhoria-nome")) document.getElementById("w-melhoria-nome").value = (p.impl && p.impl.nome) || "";
+  fillSelect("w-melhoria-tipo", TIPOS_MELHORIA, p.impl && p.impl.tipo);
+  if(document.getElementById("w-impl-manutencao")) document.getElementById("w-impl-manutencao").value = p.impl?.manutencao || 0;
+  if(document.getElementById("w-impl-dev")) document.getElementById("w-impl-dev").value = p.impl?.dev || 0;
+  if(document.getElementById("w-impl-aquis")) document.getElementById("w-impl-aquis").value = p.impl?.aquis || 0;
+  if(document.getElementById("w-impl-trein")) document.getElementById("w-impl-trein").value = p.impl?.trein || 0;
+  if(document.getElementById("w-impl-outros")) document.getElementById("w-impl-outros").value = p.impl?.outros || 0;
+  if(document.getElementById("w-tobe-tempo")) document.getElementById("w-tobe-tempo").value = p.tobe?.tempo || 0;
+  if(document.getElementById("w-tobe-pessoas")) document.getElementById("w-tobe-pessoas").value = p.tobe?.pessoas || 1;
+  if(document.getElementById("w-tobe-freq")) document.getElementById("w-tobe-freq").value = p.tobe?.freq || 0;
+  fillSelect("w-tobe-periodicidade", PERIODICIDADES, p.tobe?.periodicidade);
+  if(document.getElementById("w-tobe-valorhora")) document.getElementById("w-tobe-valorhora").value = p.tobe?.valorHora || 0;
+  if(document.getElementById("w-tobe-outros")) document.getElementById("w-tobe-outros").value = p.tobe?.outrosCustos || 0;
+  if(document.getElementById("w-tobe-retrabalho")) document.getElementById("w-tobe-retrabalho").value = Math.round((p.tobe?.retrabalho||0)*1000)/10;
+  fillSelect("w-validacao", STATUS_VALIDACAO, p.validacao);
+  fillSelect("w-categoria", CATEGORIAS_BENEFICIO, p.categoria);
+  if(document.getElementById("w-obs")) document.getElementById("w-obs").value = p.obs || "";
+}
+function openWizardForNew(){
+  state.editingProcId = null;
+  const title = document.getElementById("wizard-title");
+  const saveBtn = document.getElementById("wizard-save");
+  const overlay = document.getElementById("wizard-overlay");
+  const banner = document.getElementById("wizard-banner");
+  if(title) title.textContent = "Nova mensuração de melhoria";
+  if(saveBtn) saveBtn.textContent = "Salvar mensuração";
+  resetWizardForm();
+  if(overlay) overlay.hidden = false;
+  if(banner) banner.hidden = true;
+  updateWizardPreview();
+}
+function openWizardForEdit(p){
+  state.editingProcId = p.id;
+  const title = document.getElementById("wizard-title");
+  const saveBtn = document.getElementById("wizard-save");
+  const overlay = document.getElementById("wizard-overlay");
+  const banner = document.getElementById("wizard-banner");
+  if(title) title.textContent = "Editar mensuração";
+  if(saveBtn) saveBtn.textContent = "Salvar alterações";
+  fillWizardForm(p);
+  if(overlay) overlay.hidden = false;
+  if(banner) banner.hidden = true;
+  updateWizardPreview();
+}
+function closeWizard(){ 
+  const overlay = document.getElementById("wizard-overlay");
+  if(overlay) overlay.hidden = true; 
+  state.editingProcId = null; 
+}
+function resetWizardForm(){
+  ["w-nome","w-responsavel","w-asis-tempo","w-asis-freq","w-asis-valorhora","w-melhoria-nome",
+   "w-impl-dev","w-impl-aquis","w-impl-trein","w-impl-outros","w-impl-manutencao","w-tobe-tempo","w-tobe-freq","w-tobe-valorhora","w-obs"]
+   .forEach(id=> { const el = document.getElementById(id); if(el) el.value = ""; });
+  if(document.getElementById("w-asis-pessoas")) document.getElementById("w-asis-pessoas").value=1;
+  if(document.getElementById("w-asis-outros")) document.getElementById("w-asis-outros").value=0;
+  if(document.getElementById("w-asis-retrabalho")) document.getElementById("w-asis-retrabalho").value=0;
+  if(document.getElementById("w-tobe-pessoas")) document.getElementById("w-tobe-pessoas").value=1;
+  if(document.getElementById("w-tobe-outros")) document.getElementById("w-tobe-outros").value=0;
+  if(document.getElementById("w-tobe-retrabalho")) document.getElementById("w-tobe-retrabalho").value=0;
+  initWizardStatic();
+  updateWizardPreview();
+}
+function wireWizard(){
+  const frenteSel = document.getElementById("w-frente");
+  const addBtn = document.getElementById("btn-add");
+  const closeBtn = document.getElementById("wizard-close");
+  const cancelBtn = document.getElementById("wizard-cancel");
+  const overlay = document.getElementById("wizard-overlay");
+  const body = document.getElementById("wizard-body");
+  const saveBtn = document.getElementById("wizard-save");
+
+  if(frenteSel) frenteSel.addEventListener("change",(e)=>{ fillSelect("w-setor", SETORES[e.target.value]||[]); });
+  if(addBtn) addBtn.addEventListener("click", openWizardForNew);
+  if(closeBtn) closeBtn.addEventListener("click", closeWizard);
+  if(cancelBtn) cancelBtn.addEventListener("click", closeWizard);
+  if(overlay) overlay.addEventListener("click",(e)=>{ if(e.target.id==="wizard-overlay") closeWizard(); });
+  if(body){
+    body.addEventListener("input", updateWizardPreview);
+    body.addEventListener("change", updateWizardPreview);
+  }
+  if(saveBtn){
+    saveBtn.addEventListener("click", async ()=>{
+      const data = readWizardForm();
+      const banner = document.getElementById("wizard-banner");
+      const bannerText = document.getElementById("wizard-banner-text");
+      if(!data.nome || !data.asis.tempo || !data.asis.freq || !data.asis.valorHora || !data.tobe.tempo || !data.tobe.freq){
+        if(bannerText) bannerText.textContent = "Preencha o nome do processo e os campos obrigatórios (*) dos cenários AS-IS e TO-BE.";
+        if(banner) banner.hidden = false;
+        return;
+      }
+      if(state.editingProcId){
+        await updateProcesso(state.editingProcId, data);
+      }else{
+        await saveProcesso(data);
+      }
+      state.editingProcId = null;
+      closeWizard();
+    });
+  }
+}
+
+/* ============================================================
+   TRACK MODAL
+============================================================ */
+function openTrackModal(procId){
+  state.editingTrackProcId = procId;
+  const p = state.processos.find(x=>x.id===procId);
+  const nameEl = document.getElementById("track-proc-name");
+  const overlay = document.getElementById("track-overlay");
+  if(nameEl) nameEl.textContent = p ? p.nome : "";
+  fillSelect("t-mes", MESES, MESES[0]);
+  if(document.getElementById("t-ano")) document.getElementById("t-ano").value = 2026;
+  if(document.getElementById("t-horas")) document.getElementById("t-horas").value = "";
+  if(document.getElementById("t-evidencia")) document.getElementById("t-evidencia").value = "";
+  if(document.getElementById("t-obs")) document.getElementById("t-obs").value = "";
+  if(overlay) overlay.hidden = false;
+  updateTrackPreview();
+}
+function closeTrackModal(){ const overlay = document.getElementById("track-overlay"); if(overlay) overlay.hidden = true; }
+function updateTrackPreview(){
+  const p = state.processos.find(x=>x.id===state.editingTrackProcId);
+  const horas = Number(document.getElementById("t-horas")?.value)||0;
+  const el = document.getElementById("track-preview");
+  if(!p || !el){ if(el) el.innerHTML=""; return; }
+  const tc = computeTracking({ horasReal: horas }, p);
+  const atingCls = tc.pctAtingimento>=1 ? "good" : (tc.pctAtingimento>=0.85?"warning":"critical");
+  el.innerHTML = `
+    <div class="preview-item"><span class="l">Economia Prevista</span><span class="v">${fmtBRL.format(tc.econFinPrevista)}</span></div>
+    <div class="preview-item"><span class="l">Economia Realizada</span><span class="v">${fmtBRL.format(tc.econFinRealizada)}</span></div>
+    <div class="preview-item"><span class="l">Atingimento</span><span class="v" style="color:var(--${atingCls})">${(tc.pctAtingimento*100).toFixed(0)}%</span></div>`;
+}
+function wireTrackModal(){
+  const closeBtn = document.getElementById("track-close");
+  const cancelBtn = document.getElementById("track-cancel");
+  const overlay = document.getElementById("track-overlay");
+  const horasInput = document.getElementById("t-horas");
+  const saveBtn = document.getElementById("track-save");
+
+  if(closeBtn) closeBtn.addEventListener("click", closeTrackModal);
+  if(cancelBtn) cancelBtn.addEventListener("click", closeTrackModal);
+  if(overlay) overlay.addEventListener("click",(e)=>{ if(e.target.id==="track-overlay") closeTrackModal(); });
+  if(horasInput) horasInput.addEventListener("input", updateTrackPreview);
+  if(saveBtn){
+    saveBtn.addEventListener("click", async ()=>{
+      const horas = document.getElementById("t-horas")?.value;
+      if(!horas && horas !== "0"){ alert("Informe as horas efetivamente consumidas no mês."); return; }
+      const row = {
+        processoId: state.editingTrackProcId,
+        mes: document.getElementById("t-mes")?.value || "Janeiro",
+        ano: Number(document.getElementById("t-ano")?.value)||2026,
+        horasReal: Number(horas)||0,
+        evidencia: (document.getElementById("t-evidencia")?.value||"").trim(),
+        obs: (document.getElementById("t-obs")?.value||"").trim()
+      };
+      await saveTracking(row);
+      closeTrackModal();
+    });
+  }
+}
+
+/* ============================================================
+   PARÂMETROS MODAL
+============================================================ */
+function updatePremisesChip(){
+  const chip = document.getElementById("premises-chip");
+  if(!chip) return;
+  const vals = MESES.map(m=>Number(CONST.diasUteisPorMes[m])||0);
+  const min = Math.min(...vals), max = Math.max(...vals);
+  const diasTxt = min===max ? `${min} dias úteis/mês` : `${min}–${max} dias úteis/mês`;
+  chip.textContent = `${diasTxt} · ${CONST.jornadaDiaria}h/dia · 12 meses/ano`;
+}
+function renderParamModalLists(){
+  const fl = document.getElementById("param-frentes-list");
+  if(fl){
+    fl.innerHTML = BASE_FRENTES.map(f=>`<div class="param-list-item"><span>${f}</span><span class="tag">padrão</span></div>`).join("")
+      + state.customFrentes.map(f=>`<div class="param-list-item"><span>${f}</span><button class="rm" data-kind="frente" data-val="${f}">remover</button></div>`).join("");
+  }
+
+  const sl = document.getElementById("param-setores-list");
+  if(sl){
+    let setorRows = "";
+    FRENTES.forEach(f=>{
+      (BASE_SETORES[f]||[]).forEach(s=> setorRows += `<div class="param-list-item"><span>${s}</span><span class="tag">padrão</span></div>`);
+      (state.customSetores[f]||[]).forEach(s=> setorRows += `<div class="param-list-item"><span>${s} <span style="color:var(--ink-muted)">· ${f}</span></span><button class="rm" data-kind="setor" data-frente="${f}" data-val="${s}">remover</button></div>`);
+    });
+    sl.innerHTML = setorRows;
+  }
+  fillSelect("param-setor-frente", FRENTES);
+
+  const stl = document.getElementById("param-status-list");
+  if(stl){
+    stl.innerHTML = BASE_STATUS_INICIATIVA.map(s=>`<div class="param-list-item"><span>${s}</span><span class="tag">padrão</span></div>`).join("")
+      + state.customStatus.map(s=>`<div class="param-list-item"><span>${s}</span><button class="rm" data-kind="status" data-val="${s}">remover</button></div>`).join("");
+  }
+}
+function renderParamMonths(){
+  const el = document.getElementById("param-months");
+  if(el){
+    el.innerHTML = MESES.map(m=>`<div class="month-row"><label>${m}</label><input type="number" min="0" max="31" step="1" data-month="${m}" value="${CONST.diasUteisPorMes[m]}"></div>`).join("");
+  }
+  const jornadaInput = document.getElementById("param-jornada");
+  if(jornadaInput) jornadaInput.value = CONST.jornadaDiaria;
+}
+function openParamsModal(){
+  renderParamModalLists();
+  renderParamMonths();
+  const overlay = document.getElementById("params-overlay");
+  if(overlay) overlay.hidden = false;
+}
+function closeParamsModal(){ const overlay = document.getElementById("params-overlay"); if(overlay) overlay.hidden = true; }
+function wireParamsModal(){
+  const openBtn = document.getElementById("btn-params");
+  const closeBtn = document.getElementById("params-close");
+  const cancelBtn = document.getElementById("params-cancel");
+  const overlay = document.getElementById("params-overlay");
+  const addFrenteBtn = document.getElementById("param-frente-add");
+  const addSetorBtn = document.getElementById("param-setor-add");
+  const addStatusBtn = document.getElementById("param-status-add");
+  const saveBtn = document.getElementById("params-save");
+
+  if(openBtn) openBtn.addEventListener("click", openParamsModal);
+  if(closeBtn) closeBtn.addEventListener("click", closeParamsModal);
+  if(cancelBtn) cancelBtn.addEventListener("click", closeParamsModal);
+  if(overlay) overlay.addEventListener("click",(e)=>{ if(e.target.id==="params-overlay") closeParamsModal(); });
+
+  if(addFrenteBtn){
+    addFrenteBtn.addEventListener("click",()=>{
+      const input = document.getElementById("param-frente-new");
+      const val = input ? input.value.trim() : "";
+      if(!val || FRENTES.includes(val)) return;
+      state.customFrentes.push(val);
+      state.customSetores[val] = state.customSetores[val] || [];
+      if(input) input.value = "";
+      rebuildParamLists(); refreshFilterOptions(); initWizardStatic();
+      renderParamModalLists(); refreshCalcs();
+    });
+  }
+  if(addSetorBtn){
+    addSetorBtn.addEventListener("click",()=>{
+      const frente = document.getElementById("param-setor-frente")?.value;
+      const input = document.getElementById("param-setor-new");
+      const val = input ? input.value.trim() : "";
+      if(!val || !frente || (SETORES[frente]||[]).includes(val)) return;
+      state.customSetores[frente] = state.customSetores[frente] || [];
+      state.customSetores[frente].push(val);
+      if(input) input.value = "";
+      rebuildParamLists(); refreshFilterOptions(); initWizardStatic();
+      renderParamModalLists(); refreshCalcs();
+    });
+  }
+  if(addStatusBtn){
+    addStatusBtn.addEventListener("click",()=>{
+      const input = document.getElementById("param-status-new");
+      const val = input ? input.value.trim() : "";
+      if(!val || STATUS_INICIATIVA.includes(val)) return;
+      state.customStatus.push(val);
+      if(input) input.value = "";
+      rebuildParamLists(); refreshFilterOptions(); initWizardStatic();
+      renderParamModalLists(); refreshCalcs();
+    });
+  }
+  document.querySelectorAll(".param-list").forEach(list=>{
+    list.addEventListener("click",(e)=>{
+      const btn = e.target.closest(".rm");
+      if(!btn) return;
+      const kind = btn.dataset.kind, val = btn.dataset.val;
+      if(kind==="frente"){
+        state.customFrentes = state.customFrentes.filter(f=>f!==val);
+        delete state.customSetores[val];
+      }else if(kind==="setor"){
+        const frente = btn.dataset.frente;
+        state.customSetores[frente] = (state.customSetores[frente]||[]).filter(s=>s!==val);
+      }else if(kind==="status"){
+        state.customStatus = state.customStatus.filter(s=>s!==val);
+      }
+      rebuildParamLists(); refreshFilterOptions(); initWizardStatic();
+      renderParamModalLists(); refreshCalcs();
+    });
+  });
+  if(saveBtn){
+    saveBtn.addEventListener("click",()=>{
+      const monthInputs = document.querySelectorAll("#param-months input[data-month]");
+      monthInputs.forEach(inp=>{ CONST.diasUteisPorMes[inp.dataset.month] = Number(inp.value)||0; });
+      const jornadaVal = document.getElementById("param-jornada")?.value;
+      if(jornadaVal) CONST.jornadaDiaria = Number(jornadaVal)||CONST.jornadaDiaria;
+      updatePremisesChip();
+      refreshCalcs();
+      closeParamsModal();
+    });
+  }
+}
+
+/* CSV export button listener */
+const exportBtn = document.getElementById("btn-export");
+if(exportBtn) exportBtn.addEventListener("click", exportCSV);
+
+/* ============================================================
+   INICIALIZAÇÃO DA APLICAÇÃO
+============================================================ */
+initTheme();
+populateFilterSelects();
+initWizardStatic();
+wireWizard();
+wireTrackModal();
+wireParamsModal();
+wireAuthModal();
+wireAdminModal();
+updatePremisesChip();
+initData();
+</script>
+</body>
+</html>
