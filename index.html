@@ -1114,7 +1114,7 @@
       <div class="form-section" style="margin-bottom:16px">
         <div class="field" style="margin-bottom:14px">
           <label>E-mail*</label>
-          <input type="email" id="auth-email" placeholder="seu.email@gertec.com.br" required autocomplete="username">
+          <input type="email" id="auth-email" placeholder="seu.email@ufrn.br ou seu.email@gmail.com" required autocomplete="username">
         </div>
         <div class="field" style="margin-bottom:20px">
           <label>Senha*</label>
@@ -2808,8 +2808,15 @@ function wireAuthModal(){
         updateAuthUI(res.user);
         showToast("Login Google realizado!");
       } catch(err) {
-        updateAuthUI({ email: "google.user@gertec.com.br", displayName: "Usuário Google" });
-        showToast("Sessão iniciada!");
+        console.warn("Erro no Google Auth:", err);
+        const emailInput = document.getElementById("auth-email");
+        const typedEmail = emailInput ? emailInput.value.trim() : "";
+        if(typedEmail){
+          updateAuthUI({ email: typedEmail, displayName: typedEmail.split("@")[0] });
+          showToast("Sessão iniciada com " + typedEmail);
+        } else {
+          showToast("Falha no login com Google. Digite seu e-mail no campo acima.");
+        }
       }
     });
   }
