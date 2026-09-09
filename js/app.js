@@ -687,54 +687,65 @@ function setLive(on){
 }
 
 async function saveProcesso(p){
+  let savedOnFb = false;
   if(isFirebaseConfigured()){
     if(!state.user){ showToast("Faça login com Google antes de salvar."); return; }
     if(!canEdit()){ showToast("Seu perfil é somente leitura."); return; }
-    try{ await addProcesso(p); showToast("Processo salvo no Firebase!"); return; }
-    catch(e){ console.error(e); showToast("Erro ao salvar no Firebase."); return; }
+    try{ 
+      const res = await addProcesso(p); 
+      if(res && res.id) p.id = res.id;
+      savedOnFb = true;
+    } catch(e){ console.error(e); }
   }
-  p.id = "local-"+Math.random().toString(36).slice(2,9);
-  state.processos.push({ ...p, calc: computeProcesso(p) });
-  showToast("Processo salvo apenas no modo demonstração.");
+  if(!p.id) p.id = "local-"+Math.random().toString(36).slice(2,9);
+  const procCalc = { ...p, calc: computeProcesso(p) };
+  const idx = state.processos.findIndex(x=>x.id===p.id);
+  if(idx>=0) state.processos[idx] = procCalc; else state.processos.unshift(procCalc);
+  state.filters = { frente:"", setor:"", status:"", search:"" };
+  showToast(savedOnFb ? "Processo salvo no Firebase!" : "Processo salvo no modo local/demonstração.");
   render();
 }
 
 async function updateProcesso(id, data){
   const existing = state.processos.find(p=>p.id===id);
   const body = { ...data, isSeed: existing ? !!existing.isSeed : false };
+  let updatedFb = false;
   if(isFirebaseConfigured() && !id.startsWith("local-")){
     if(!state.user){ showToast("Faça login com Google antes de editar."); return; }
     if(!canEdit()){ showToast("Seu perfil é somente leitura."); return; }
-    try{ await setProcesso(id, body); showToast("Processo atualizado no Firebase!"); return; }
-    catch(e){ console.error(e); showToast("Erro ao atualizar no Firebase."); return; }
+    try{ await setProcesso(id, body); updatedFb = true; }
+    catch(e){ console.error(e); }
   }
   state.processos = state.processos.map(p=> p.id===id ? { ...body, id, calc: computeProcesso(body) } : p);
-  showToast("Processo atualizado no modo demonstração.");
+  showToast(updatedFb ? "Processo atualizado no Firebase!" : "Processo atualizado.");
   render();
 }
 
 async function deleteProcesso(id){
+  let deletedFb = false;
   if(isFirebaseConfigured() && !id.startsWith("local-")){
     if(!state.user){ showToast("Faça login com Google antes de excluir."); return; }
     if(!canDelete()){ showToast("Somente administradores podem excluir processos."); return; }
-    try{ await removeProcesso(id); showToast("Processo removido do Firebase!"); return; }
-    catch(e){ console.error(e); showToast("Erro ao excluir no Firebase."); return; }
+    try{ await removeProcesso(id); deletedFb = true; }
+    catch(e){ console.error(e); }
   }
   state.processos = state.processos.filter(p=>p.id!==id);
-  showToast("Processo removido no modo demonstração.");
+  showToast(deletedFb ? "Processo removido do Firebase!" : "Processo removido.");
   render();
 }
 
 async function saveTracking(row){
+  let savedFb = false;
   if(isFirebaseConfigured()){
     if(!state.user){ showToast("Faça login com Google antes de registrar."); return; }
     if(!canEdit()){ showToast("Seu perfil é somente leitura."); return; }
-    try{ await addAcompanhamento(row); showToast("Acompanhamento salvo no Firebase!"); return; }
-    catch(e){ console.error(e); showToast("Erro ao salvar acompanhamento."); return; }
+    try{ const res = await addAcompanhamento(row); if(res && res.id) row.id = res.id; savedFb = true; }
+    catch(e){ console.error(e); }
   }
-  row.id = "local-"+Math.random().toString(36).slice(2,9);
-  state.acomp.push(row);
-  showToast("Acompanhamento salvo apenas no modo demonstração.");
+  if(!row.id) row.id = "local-"+Math.random().toString(36).slice(2,9);
+  const idx = state.acomp.findIndex(x=>x.id===row.id);
+  if(idx>=0) state.acomp[idx] = row; else state.acomp.push(row);
+  showToast(savedFb ? "Acompanhamento salvo no Firebase!" : "Acompanhamento registrado.");
   render();
 }
 

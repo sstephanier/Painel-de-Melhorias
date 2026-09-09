@@ -1762,9 +1762,9 @@ function defaultUserPermissions(){
     { email: "stephanierodrigues.090@ufrn.edu.br", role: "admin", areas: ["*"] },
     { email: "stephanie.rodrigues.090@ufrn.edu.br", role: "admin", areas: ["*"] },
     { email: "jennefer.lima.125@ufrn.edu.br", role: "editor", areas: ["*"] },
-    { email: "manufatura@gertec.com.br", role: "editor", areas: ["Manufatura"] },
-    { email: "engenharia@gertec.com.br", role: "editor", areas: ["Engenharia"] },
-    { email: "rh@gertec.com.br", role: "editor", areas: ["Recursos Humanos"] }
+    { email: "manufatura@gertec.com.br", role: "editor", areas: ["*"] },
+    { email: "engenharia@gertec.com.br", role: "editor", areas: ["*"] },
+    { email: "rh@gertec.com.br", role: "editor", areas: ["*"] }
   ];
 }
 
@@ -1809,7 +1809,13 @@ function getUserPermission(email){
     return { role: "admin", areas: ["*"] };
   }
   const found = state.userPermissions.find(u => (u.email||"").toLowerCase().trim() === lower);
-  return found || { role: "editor", areas: ["*"] };
+  if(found) {
+    if(found.role === "editor" || found.role === "admin") {
+      return { ...found, areas: ["*"] };
+    }
+    return found;
+  }
+  return { role: "editor", areas: ["*"] };
 }
 
 function registerUserLogin(user){
@@ -1846,6 +1852,17 @@ function registerUserLogin(user){
 
 function updateAuthUI(user){
   state.user = user;
+  
+  // Limpar filtros de interface ao trocar de conta/login para evitar ocultar dados de outros autores
+  state.filters = { frente:"", setor:"", status:"", author:"", search:"" };
+  const autorSel = document.getElementById("f-autor");
+  if(autorSel) autorSel.value = "";
+  const frenteSel = document.getElementById("f-frente");
+  if(frenteSel) frenteSel.value = "";
+  const searchInput = document.getElementById("f-search");
+  if(searchInput) searchInput.value = "";
+  refreshFilterOptions();
+
   if(user && user.email){
     registerUserLogin(user);
     try { localStorage.setItem("gertec_saved_user", JSON.stringify(user)); } catch(e){}
@@ -1951,26 +1968,87 @@ function saveLocalData(){
   } catch(e){}
 }
 
+async function syncLocalItemsToFirestore(){
+  if(!fbDb || !addDoc || !setDoc || !collection || !doc) return;
+
+  // 1. Sincronizar processos locais (criados offline ou sem Firestore ativo no momento)
+  const localProcs = (state.processos || []).filter(p => p && p.id && String(p.id).startsWith("local-"));
+  for(const p of localProcs){
+    try {
+      const { calc, id, ...cleanData } = p;
+      const docRef = await addDoc(collection(fbDb, "processos"), cleanData);
+      if(docRef && docRef.id){
+        state.acomp.forEach(a => {
+          if(a.processoId === id) a.processoId = docRef.id;
+        });
+        p.id = docRef.id;
+      }
+    } catch(err){
+      console.warn("Erro ao sincronizar processo local com Firestore:", err);
+    }
+  }
+
+  // 2. Sincronizar acompanhamentos locais
+  const localAcomp = (state.acomp || []).filter(a => a && a.id && String(a.id).startsWith("local-"));
+  for(const a of localAcomp){
+    try {
+      const { id, ...cleanData } = a;
+      const docRef = await addDoc(collection(fbDb, "acompanhamentos"), cleanData);
+      if(docRef && docRef.id){
+        a.id = docRef.id;
+      }
+    } catch(err){
+      console.warn("Erro ao sincronizar acompanhamento local com Firestore:", err);
+    }
+  }
+
+  // 3. Garantir semente no Firestore se a coleção estiver vazia
+  const seedProcs = (state.processos || []).filter(p => p && p.isSeed);
+  for(const p of seedProcs){
+    try {
+      const { calc, ...cleanData } = p;
+      await setDoc(doc(fbDb, "processos", p.id), cleanData, { merge: true });
+    } catch(err){}
+  }
+
+  const seedAcomp = (state.acomp || []).filter(a => a && a.isSeed);
+  for(const a of seedAcomp){
+    try {
+      await setDoc(doc(fbDb, "acompanhamentos", a.id), a, { merge: true });
+    } catch(err){}
+  }
+
+  saveLocalData();
+}
+
 function subscribeFirestoreData(){
   if(!fbDb || !onSnapshot || !collection) return;
   onSnapshot(collection(fbDb, "processos"), (snap) => {
-    if(!snap.empty) {
-      state.processos = withCalc(snap.docs.map(d=>({ id:d.id, ...d.data() })));
+    if(snap && snap.docs) {
+      const serverProcs = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+      const localOnly = state.processos.filter(p => String(p.id).startsWith("local-") && !serverProcs.some(sp => sp.id === p.id));
+      state.processos = withCalc([...serverProcs, ...localOnly]);
       saveLocalData();
+      refreshFilterAuthorOptions();
       render();
+      if(localOnly.length > 0) syncLocalItemsToFirestore();
     }
-  }, (err)=>{});
+  }, (err)=>{ console.warn("Erro Firestore processos:", err); });
 
   onSnapshot(collection(fbDb, "acompanhamentos"), (snap) => {
-    if(!snap.empty) {
-      state.acomp = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+    if(snap && snap.docs) {
+      const serverAcomp = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+      const localOnly = state.acomp.filter(a => String(a.id).startsWith("local-") && !serverAcomp.some(sa => sa.id === a.id));
+      state.acomp = [...serverAcomp, ...localOnly];
       saveLocalData();
+      refreshFilterAuthorOptions();
       render();
+      if(localOnly.length > 0) syncLocalItemsToFirestore();
     }
-  }, (err)=>{});
+  }, (err)=>{ console.warn("Erro Firestore acompanhamentos:", err); });
 
   onSnapshot(collection(fbDb, "usuarios"), (snap) => {
-    if(!snap.empty) {
+    if(snap && snap.docs) {
       const incoming = snap.docs.map(d=>({ id:d.id, ...d.data() }));
       const permsMap = new Map();
       (state.userPermissions || []).forEach(u => {
@@ -1988,7 +2066,9 @@ function subscribeFirestoreData(){
       renderAdminUsersTable();
       render();
     }
-  }, (err)=>{});
+  }, (err)=>{ console.warn("Erro Firestore usuarios:", err); });
+
+  syncLocalItemsToFirestore();
 }
 
 async function saveProcesso(p){
@@ -1998,18 +2078,36 @@ async function saveProcesso(p){
   p.createdByDisplayName = p.createdByDisplayName || activeUserName;
   p.createdAt = p.createdAt || new Date().toLocaleString("pt-BR");
 
+  let savedId = "local-"+Math.random().toString(36).slice(2,9);
+  let savedOnServer = false;
   if(fbDb && addDoc && collection){
     try{ 
       const docRef = await addDoc(collection(fbDb, "processos"), p);
-      p.id = docRef.id;
-      showToast("Processo salvo no servidor!"); 
-      return; 
-    }catch(e){}
+      if(docRef && docRef.id) savedId = docRef.id;
+      savedOnServer = true;
+    }catch(e){
+      console.warn("Erro ao salvar processo no Firestore:", e);
+    }
   }
-  p.id = "local-"+Math.random().toString(36).slice(2,9);
-  state.processos.push({ ...p, calc: computeProcesso(p) });
+  p.id = savedId;
+  const procCalculated = { ...p, calc: computeProcesso(p) };
+  const existingIdx = state.processos.findIndex(item => item.id === savedId);
+  if(existingIdx >= 0){
+    state.processos[existingIdx] = procCalculated;
+  } else {
+    state.processos.unshift(procCalculated);
+  }
+  
+  // Limpa filtros ativos de interface para exibir o processo recém-cadastrado
+  state.filters = { frente:"", setor:"", status:"", author:"", search:"" };
+  refreshFilterOptions();
+  
+  // Expande os detalhes do processo recém-cadastrado
+  openDetailIds.add(savedId);
+
   saveLocalData();
-  showToast("Processo salvo localmente!");
+  refreshFilterAuthorOptions();
+  showToast(savedOnServer ? "Processo salvo no servidor!" : "Processo salvo localmente!");
   render();
 }
 
@@ -2023,30 +2121,37 @@ async function updateProcesso(id, data){
     updatedBy: activeUserEmail,
     updatedAt: new Date().toLocaleString("pt-BR")
   };
+  let savedOnServer = false;
   if(fbDb && setDoc && doc && !id.startsWith("local-")){
     try{ 
       await setDoc(doc(fbDb, "processos", id), body, { merge:true }); 
-      showToast("Processo atualizado no servidor!"); 
-      return; 
-    }catch(e){}
+      savedOnServer = true;
+    }catch(e){
+      console.warn("Erro ao atualizar no Firestore:", e);
+    }
   }
   state.processos = state.processos.map(p=> p.id===id ? { ...body, id, calc: computeProcesso(body) } : p);
   saveLocalData();
-  showToast("Processo atualizado!");
+  refreshFilterAuthorOptions();
+  showToast(savedOnServer ? "Processo atualizado no servidor!" : "Processo atualizado!");
   render();
 }
 
 async function deleteProcesso(id){
+  let removedOnServer = false;
   if(fbDb && deleteDoc && doc && !id.startsWith("local-")){
     try{ 
       await deleteDoc(doc(fbDb, "processos", id)); 
-      showToast("Processo removido no servidor!"); 
-      return; 
-    }catch(e){}
+      removedOnServer = true;
+    }catch(e){
+      console.warn("Erro ao remover no Firestore:", e);
+    }
   }
   state.processos = state.processos.filter(p=>p.id!==id);
+  openDetailIds.delete(id);
   saveLocalData();
-  showToast("Processo removido!");
+  refreshFilterAuthorOptions();
+  showToast(removedOnServer ? "Processo removido no servidor!" : "Processo removido!");
   render();
 }
 
@@ -2057,18 +2162,31 @@ async function saveTracking(row){
   row.createdByDisplayName = row.createdByDisplayName || activeUserName;
   row.createdAt = row.createdAt || new Date().toLocaleString("pt-BR");
 
+  let savedId = "local-"+Math.random().toString(36).slice(2,9);
+  let savedOnServer = false;
   if(fbDb && addDoc && collection){
     try{ 
       const docRef = await addDoc(collection(fbDb, "acompanhamentos"), row); 
-      row.id = docRef.id;
-      showToast("Acompanhamento registrado no servidor!"); 
-      return; 
-    }catch(e){}
+      if(docRef && docRef.id) savedId = docRef.id;
+      savedOnServer = true;
+    }catch(e){
+      console.warn("Erro ao salvar acompanhamento no Firestore:", e);
+    }
   }
-  row.id = "local-"+Math.random().toString(36).slice(2,9);
-  state.acomp.push(row);
+  row.id = savedId;
+  const existingIdx = state.acomp.findIndex(item => item.id === savedId);
+  if(existingIdx >= 0){
+    state.acomp[existingIdx] = row;
+  } else {
+    state.acomp.push(row);
+  }
+
+  // Auto-expande detalhes do processo para mostrar a mensuração do mês registrado
+  if(row.processoId) openDetailIds.add(row.processoId);
+
   saveLocalData();
-  showToast("Acompanhamento registrado!");
+  refreshFilterAuthorOptions();
+  showToast(savedOnServer ? "Acompanhamento registrado no servidor!" : "Acompanhamento registrado!");
   render();
 }
 
@@ -2089,8 +2207,8 @@ function filteredProcessos(){
   const perm = getUserPermission(state.user?.email);
 
   return state.processos.filter(p=>{
-    // Filtragem por permissão de usuário
-    if(perm.areas && !perm.areas.includes("*") && perm.role !== "admin"){
+    // Editor e Administrador possuem acesso visual a todas as mensurações/processos
+    if(perm.areas && !perm.areas.includes("*") && perm.role !== "admin" && perm.role !== "editor"){
       if(!perm.areas.includes(p.frente)) return false;
     }
     // Filtros de interface
