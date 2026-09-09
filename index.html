@@ -1536,15 +1536,14 @@ async function initFirebase() {
     signOut = authMod.signOut;
     onAuthStateChanged = authMod.onAuthStateChanged;
 
+    if (fbDb) {
+      subscribeFirestoreData();
+      setLiveStatus(true);
+    }
+
     if (fbAuth && onAuthStateChanged) {
       onAuthStateChanged(fbAuth, (user) => {
         updateAuthUI(user);
-        if (user) {
-          setLiveStatus(true);
-          subscribeFirestoreData();
-        } else {
-          setLiveStatus(false);
-        }
       });
     }
   } catch(e) {
