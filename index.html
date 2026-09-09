@@ -1167,9 +1167,9 @@
 
     <button class="btn btn-ghost" id="btn-theme" title="Alternar tema claro/escuro">🌙 Tema</button>
     <button class="btn btn-ghost" id="btn-export" title="Exportar dados para CSV">Exportar CSV</button>
-    <button class="btn btn-ghost" id="btn-params">Parâmetros</button>
+    <button class="btn btn-ghost" id="btn-params" hidden>Parâmetros</button>
     <button class="btn btn-ghost" id="btn-admin-modal" hidden>Administração</button>
-    <button class="btn btn-accent" id="btn-add">+ Nova mensuração</button>
+    <button class="btn btn-accent" id="btn-add" hidden>+ Nova mensuração</button>
   </header>
 
   <!-- Visual Frente Tabs Bar -->
@@ -3272,6 +3272,13 @@ function fillWizardForm(p){
   if(document.getElementById("w-obs")) document.getElementById("w-obs").value = p.obs || "";
 }
 function openWizardForNew(){
+  const isLoggedIn = isUserLoggedIn();
+  const perm = getUserPermission(state.user?.email);
+  const canEdit = Boolean(isLoggedIn && (perm.role === "admin" || perm.role === "editor"));
+  if(!canEdit){
+    alert("🔒 Apenas usuários cadastrados (Editores ou Administradores) podem criar novas mensurações.");
+    return;
+  }
   state.editingProcId = null;
   const title = document.getElementById("wizard-title");
   const saveBtn = document.getElementById("wizard-save");
@@ -3285,6 +3292,13 @@ function openWizardForNew(){
   updateWizardPreview();
 }
 function openWizardForEdit(p){
+  const isLoggedIn = isUserLoggedIn();
+  const perm = getUserPermission(state.user?.email);
+  const canEdit = Boolean(isLoggedIn && (perm.role === "admin" || perm.role === "editor"));
+  if(!canEdit){
+    alert("🔒 Apenas usuários cadastrados com permissão de edição podem editar mensurações.");
+    return;
+  }
   state.editingProcId = p.id;
   const title = document.getElementById("wizard-title");
   const saveBtn = document.getElementById("wizard-save");
@@ -3358,6 +3372,13 @@ function wireWizard(){
    TRACK MODAL
 ============================================================ */
 function openTrackModal(procId){
+  const isLoggedIn = isUserLoggedIn();
+  const perm = getUserPermission(state.user?.email);
+  const canEdit = Boolean(isLoggedIn && (perm.role === "admin" || perm.role === "editor"));
+  if(!canEdit){
+    alert("🔒 Apenas usuários cadastrados com permissão de edição podem registrar acompanhamentos.");
+    return;
+  }
   state.editingTrackProcId = procId;
   const p = state.processos.find(x=>x.id===procId);
   const nameEl = document.getElementById("track-proc-name");
