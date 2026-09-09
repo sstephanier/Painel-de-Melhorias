@@ -1836,10 +1836,10 @@ function registerUserLogin(user){
   }
 
   saveLocalData();
-  if(fbDb && fbAuth?.currentUser && setDoc && doc){
+  if(fbDb && setDoc && doc){
     try {
       const docId = getUserDocId(user.email);
-      setDoc(doc(fbDb, "usuarios", docId), existing, { merge: true });
+      setDoc(doc(fbDb, "usuarios", docId), existing, { merge: true }).catch(()=>{});
     } catch(e){}
   }
 }
@@ -1998,11 +1998,11 @@ async function saveProcesso(p){
   p.createdByDisplayName = p.createdByDisplayName || activeUserName;
   p.createdAt = p.createdAt || new Date().toLocaleString("pt-BR");
 
-  if(fbDb && fbAuth?.currentUser && addDoc && collection){
+  if(fbDb && addDoc && collection){
     try{ 
       const docRef = await addDoc(collection(fbDb, "processos"), p);
       p.id = docRef.id;
-      showToast("Processo salvo!"); 
+      showToast("Processo salvo no servidor!"); 
       return; 
     }catch(e){}
   }
@@ -2023,10 +2023,10 @@ async function updateProcesso(id, data){
     updatedBy: activeUserEmail,
     updatedAt: new Date().toLocaleString("pt-BR")
   };
-  if(fbDb && fbAuth?.currentUser && setDoc && doc && !id.startsWith("local-")){
+  if(fbDb && setDoc && doc && !id.startsWith("local-")){
     try{ 
       await setDoc(doc(fbDb, "processos", id), body, { merge:true }); 
-      showToast("Processo atualizado!"); 
+      showToast("Processo atualizado no servidor!"); 
       return; 
     }catch(e){}
   }
@@ -2037,10 +2037,10 @@ async function updateProcesso(id, data){
 }
 
 async function deleteProcesso(id){
-  if(fbDb && fbAuth?.currentUser && deleteDoc && doc && !id.startsWith("local-")){
+  if(fbDb && deleteDoc && doc && !id.startsWith("local-")){
     try{ 
       await deleteDoc(doc(fbDb, "processos", id)); 
-      showToast("Processo removido!"); 
+      showToast("Processo removido no servidor!"); 
       return; 
     }catch(e){}
   }
@@ -2057,11 +2057,11 @@ async function saveTracking(row){
   row.createdByDisplayName = row.createdByDisplayName || activeUserName;
   row.createdAt = row.createdAt || new Date().toLocaleString("pt-BR");
 
-  if(fbDb && fbAuth?.currentUser && addDoc && collection){
+  if(fbDb && addDoc && collection){
     try{ 
       const docRef = await addDoc(collection(fbDb, "acompanhamentos"), row); 
       row.id = docRef.id;
-      showToast("Acompanhamento registrado!"); 
+      showToast("Acompanhamento registrado no servidor!"); 
       return; 
     }catch(e){}
   }
@@ -2968,9 +2968,10 @@ function renderAdminUsersTable(){
 
   tbody.innerHTML = list.map((u) => {
     const idx = state.userPermissions.indexOf(u);
+    const isReader = u.role === 'viewer' || u.role === 'leitor';
     const roleSelect = `
       <select class="adm-role-select" data-idx="${idx}" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-weight:600;font-size:13px;cursor:pointer">
-        <option value="viewer" ${u.role === 'viewer' ? 'selected' : ''}>👁️ Leitor (Apenas Visualização)</option>
+        <option value="leitor" ${isReader ? 'selected' : ''}>👁️ Leitor (Apenas Visualização)</option>
         <option value="editor" ${u.role === 'editor' ? 'selected' : ''}>✏️ Editor (Cria &amp; Edita)</option>
         <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>🛡️ Administrador (Acesso Total)</option>
       </select>
@@ -3029,10 +3030,10 @@ function renderAdminUsersTable(){
       userObj.role = newRole;
       saveLocalData();
 
-      if(fbDb && fbAuth?.currentUser && setDoc && doc){
+      if(fbDb && setDoc && doc){
         try {
           const docId = (userObj.email||"").toLowerCase().replace(/[^a-z0-9]/g, "_");
-          setDoc(doc(fbDb, "usuarios", docId), userObj, { merge: true });
+          setDoc(doc(fbDb, "usuarios", docId), userObj, { merge: true }).catch(()=>{});
         } catch(err){}
       }
 
@@ -3054,7 +3055,7 @@ function renderAdminUsersTable(){
       const frentesSelect = document.getElementById("adm-user-frentes");
 
       if(emailInput) emailInput.value = u.email;
-      if(roleSelect) roleSelect.value = u.role || "viewer";
+      if(roleSelect) roleSelect.value = (u.role === "viewer" || u.role === "leitor") ? "leitor" : (u.role || "leitor");
       if(frentesSelect){
         Array.from(frentesSelect.options).forEach(opt => {
           opt.selected = (u.areas || []).includes(opt.value);
@@ -3077,7 +3078,7 @@ function renderAdminUsersTable(){
         if(fbDb && deleteDoc && doc){
           try {
             const docId = (u.email||"").toLowerCase().trim().replace(/[^a-z0-9]/g, "_");
-            deleteDoc(doc(fbDb, "usuarios", docId));
+            deleteDoc(doc(fbDb, "usuarios", docId)).catch(()=>{});
           } catch(e){}
         }
         renderAdminUsersTable();
@@ -3173,10 +3174,10 @@ function wireAdminModal(){
         state.userPermissions.push(userData);
       }
 
-      if(fbDb && fbAuth?.currentUser && setDoc && doc){
+      if(fbDb && setDoc && doc){
         try {
           const docId = email.toLowerCase().trim().replace(/[^a-z0-9]/g, "_");
-          await setDoc(doc(fbDb, "usuarios", docId), userData, { merge:true });
+          await setDoc(doc(fbDb, "usuarios", docId), userData, { merge:true }).catch(()=>{});
         } catch(e){}
       }
 
