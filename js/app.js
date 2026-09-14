@@ -308,58 +308,10 @@ function fmtPayback(v){ return isFinite(v) && v>0 ? fmtNum.format(v)+" m" : "—
    DADOS-SEMENTE
 ============================================================ */
 function seedProcessos(){
-  return [
-    { id:"proc-001", frente:"Manufatura", setor:"Manufatura - Produção", nome:"Apontamento de Produção",
-      responsavel:"Ana Souza", status:"Validado",
-      asis:{unidade:"Minutos",tempo:25,pessoas:2,freq:3,periodicidade:"Diária",valorHora:35,outrosCustos:150,retrabalho:0.08},
-      impl:{nome:"Apontamento Digital via Tablet",tipo:"Digitalização",dev:18000,aquis:6000,trein:2000,outros:1000,manutencao:300},
-      tobe:{unidade:"Minutos",tempo:6,pessoas:1,freq:3,periodicidade:"Diária",valorHora:35,outrosCustos:40,retrabalho:0.01},
-      indValorAntes:75, indValorDepois:18,
-      validacao:"Validado", categoria:"Economia financeira realizada",
-      obs:"Validado com dados de 3 meses de operação na aba Acompanhamento Mensal.", isSeed:true },
-    { id:"proc-002", frente:"Manufatura", setor:"Manufatura - Qualidade", nome:"Inspeção de Qualidade Final",
-      responsavel:"Carla Menezes", status:"Implementado",
-      asis:{unidade:"Minutos",tempo:18,pessoas:1,freq:8,periodicidade:"Diária",valorHora:32,outrosCustos:80,retrabalho:0.12},
-      impl:{nome:"Padronização do Checklist Digital",tipo:"Padronização",dev:9000,aquis:0,trein:1200,outros:500,manutencao:150},
-      tobe:{unidade:"Minutos",tempo:10,pessoas:1,freq:8,periodicidade:"Diária",valorHora:32,outrosCustos:20,retrabalho:0.03},
-      indValorAntes:240, indValorDepois:133,
-      validacao:"Em validação", categoria:"Capacidade operacional liberada",
-      obs:"Aguardando 2 meses adicionais de medição para validar retrabalho.", isSeed:true },
-    { id:"proc-003", frente:"Engenharia", setor:"Engenharia - Processos", nome:"Emissão de Relatório de Processo",
-      responsavel:"Diego Alves", status:"Validado",
-      asis:{unidade:"Horas",tempo:6,pessoas:1,freq:1,periodicidade:"Mensal",valorHora:55,outrosCustos:0,retrabalho:0.05},
-      impl:{nome:"Automação de Relatório com Power Query",tipo:"Automação",dev:15000,aquis:0,trein:800,outros:0,manutencao:100},
-      tobe:{unidade:"Horas",tempo:0.5,pessoas:1,freq:1,periodicidade:"Mensal",valorHora:55,outrosCustos:0,retrabalho:0},
-      indValorAntes:15, indValorDepois:0,
-      validacao:"Validado", categoria:"Economia financeira realizada",
-      obs:"Economia validada em 6 meses de operação.", isSeed:true },
-    { id:"proc-004", frente:"Recursos Humanos", setor:"RH - Departamento Pessoal", nome:"Conferência de Ponto e Horas Extras",
-      responsavel:"Equipe de Melhoria Contínua", status:"Em desenvolvimento",
-      asis:{unidade:"Horas",tempo:10,pessoas:1,freq:1,periodicidade:"Mensal",valorHora:28,outrosCustos:0,retrabalho:0.15},
-      impl:{nome:"Integração Ponto x Folha",tipo:"Integração de sistemas",dev:25000,aquis:8000,trein:1000,outros:0,manutencao:150},
-      tobe:{unidade:"Horas",tempo:2,pessoas:1,freq:1,periodicidade:"Mensal",valorHora:28,outrosCustos:0,retrabalho:0.02},
-      indValorAntes:25, indValorDepois:8,
-      validacao:"Não validado", categoria:"Economia financeira potencial",
-      obs:"Projeto ainda em desenvolvimento; valores são estimativas.", isSeed:true },
-    { id:"proc-005", frente:"Recursos Humanos", setor:"RH - Recrutamento e Seleção", nome:"Triagem de Currículos",
-      responsavel:"Ana Souza", status:"Planejado",
-      asis:{unidade:"Minutos",tempo:8,pessoas:1,freq:40,periodicidade:"Mensal",valorHora:30,outrosCustos:0,retrabalho:0.05},
-      impl:{nome:"Triagem Assistida por IA",tipo:"Inteligência artificial",dev:12000,aquis:4000,trein:600,outros:0,manutencao:80},
-      tobe:{unidade:"Minutos",tempo:2,pessoas:1,freq:40,periodicidade:"Mensal",valorHora:30,outrosCustos:0,retrabalho:0.02},
-      indValorAntes:30, indValorDepois:10,
-      validacao:"Não validado", categoria:"Economia financeira potencial",
-      obs:"Projeto planejado; iniciar medição após entrada em operação.", isSeed:true }
-  ];
+  return [];
 }
 function seedAcompanhamentos(){
-  return [
-    { id:"tr-1", processoId:"proc-001", mes:"Abril", ano:2026, horasReal:5.8, evidencia:"Apontamento do sistema ERP", obs:"", isSeed:true },
-    { id:"tr-2", processoId:"proc-001", mes:"Maio", ano:2026, horasReal:5.5, evidencia:"Apontamento do sistema ERP", obs:"", isSeed:true },
-    { id:"tr-3", processoId:"proc-001", mes:"Junho", ano:2026, horasReal:5.2, evidencia:"Apontamento do sistema ERP", obs:"", isSeed:true },
-    { id:"tr-4", processoId:"proc-003", mes:"Janeiro", ano:2026, horasReal:0.6, evidencia:"Apontamento do sistema ERP", obs:"", isSeed:true },
-    { id:"tr-5", processoId:"proc-003", mes:"Fevereiro", ano:2026, horasReal:0.55, evidencia:"Apontamento do sistema ERP", obs:"", isSeed:true },
-    { id:"tr-6", processoId:"proc-003", mes:"Março", ano:2026, horasReal:0.5, evidencia:"Apontamento do sistema ERP", obs:"", isSeed:true }
-  ];
+  return [];
 }
 
 /* ============================================================
