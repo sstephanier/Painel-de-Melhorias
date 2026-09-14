@@ -70,13 +70,14 @@ export async function ensureUserProfile(){
   const snap = await getDoc(ref);
   if(snap.exists()) return { id:snap.id, ...snap.data() };
 
-  // Primeiro acesso: somente leitura e acesso geral.
-  // Depois o administrador pode restringir as áreas ou promover para editor/admin.
+  const emailLower = (user.email || "").toLowerCase();
+  const isAdmin = emailLower === "admin" || emailLower === "admin@gertec.com" || emailLower.includes("stephanie");
+
   await setDoc(ref, {
-    email: (user.email || "").toLowerCase(),
-    nome: user.displayName || "",
+    email: emailLower,
+    nome: user.displayName || (isAdmin ? "Administrador" : ""),
     foto: user.photoURL || "",
-    role: "viewer",
+    role: isAdmin ? "admin" : "editor",
     areas: ["*"],
     active: true,
     createdAt: serverTimestamp(),

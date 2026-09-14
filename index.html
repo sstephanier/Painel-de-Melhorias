@@ -1113,14 +1113,14 @@
     <form id="auth-form" onsubmit="return false;">
       <div class="form-section" style="margin-bottom:16px">
         <div class="field" style="margin-bottom:14px">
-          <label>E-mail*</label>
-          <input type="email" id="auth-email" placeholder="seu.email@ufrn.br ou seu.email@gmail.com" required autocomplete="username">
+          <label>E-mail ou Usuário*</label>
+          <input type="text" id="auth-email" placeholder="admin ou seu.email@empresa.com" required autocomplete="username">
         </div>
         <div class="field" style="margin-bottom:20px">
           <label>Senha*</label>
           <input type="password" id="auth-password" placeholder="••••••••" required autocomplete="current-password">
         </div>
-        <button type="button" class="btn btn-accent" id="auth-submit-btn" style="width:100%;justify-content:center;font-size:14px;padding:12px">Entrar com E-mail</button>
+        <button type="button" class="btn btn-accent" id="auth-submit-btn" style="width:100%;justify-content:center;font-size:14px;padding:12px">Entrar no Painel</button>
       </div>
     </form>
 
@@ -1759,6 +1759,8 @@ function seedAcompanhamentos(){
 
 function defaultUserPermissions(){
   return [
+    { email: "admin", displayName: "Administrador (admin)", role: "admin", areas: ["*"] },
+    { email: "admin@gertec.com", displayName: "Administrador (admin)", role: "admin", areas: ["*"] },
     { email: "stephanierodrigues.090@ufrn.edu.br", role: "admin", areas: ["*"] },
     { email: "stephanie.rodrigues.090@ufrn.edu.br", role: "admin", areas: ["*"] },
     { email: "jennefer.lima.125@ufrn.edu.br", role: "editor", areas: ["*"] },
@@ -1801,6 +1803,8 @@ function getUserPermission(email){
   if(!email) return { role: "viewer", areas: ["*"] };
   const lower = email.toLowerCase().trim();
   const isAdminEmail = 
+    lower === "admin" ||
+    lower === "admin@gertec.com" ||
     lower === "stephanierodrigues.090@ufrn.edu.br" || 
     lower === "stephanie.rodrigues.090@ufrn.edu.br" || 
     (lower.startsWith("stephanie") && lower.endsWith("@ufrn.edu.br"));
@@ -1808,7 +1812,10 @@ function getUserPermission(email){
   if(isAdminEmail) {
     return { role: "admin", areas: ["*"] };
   }
-  const found = state.userPermissions.find(u => (u.email||"").toLowerCase().trim() === lower);
+  const found = state.userPermissions.find(u => {
+    const e = (u.email||"").toLowerCase().trim();
+    return e === lower || (lower === "admin" && e === "admin@gertec.com");
+  });
   if(found) {
     if(found.role === "editor" || found.role === "admin") {
       return { ...found, areas: ["*"] };
@@ -1824,17 +1831,22 @@ function registerUserLogin(user){
   const nowStr = new Date().toLocaleString("pt-BR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
 
   if(!Array.isArray(state.userPermissions)) state.userPermissions = [];
-  let existing = state.userPermissions.find(u => (u.email||"").toLowerCase().trim() === emailLower);
+  let existing = state.userPermissions.find(u => {
+    const e = (u.email||"").toLowerCase().trim();
+    return e === emailLower || (emailLower === "admin" && e === "admin@gertec.com");
+  });
+
+  const isAdminUser = emailLower === "admin" || emailLower === "admin@gertec.com" || (emailLower.includes("stephanie") && emailLower.endsWith("@ufrn.edu.br"));
 
   if(existing){
     existing.lastLogin = nowStr;
+    if(isAdminUser) existing.role = "admin";
     if(user.displayName && !existing.displayName) existing.displayName = user.displayName;
   } else {
-    const isAdminEmail = emailLower.includes("stephanie") && emailLower.endsWith("@ufrn.edu.br");
     existing = {
       email: user.email.trim(),
-      displayName: user.displayName || user.email.split("@")[0],
-      role: isAdminEmail ? "admin" : "editor",
+      displayName: user.displayName || (isAdminUser ? "Administrador" : user.email.split("@")[0]),
+      role: isAdminUser ? "admin" : "editor",
       areas: ["*"],
       lastLogin: nowStr
     };
@@ -2988,12 +3000,52 @@ function wireAuthModal(){
   async function performLogin(){
     const emailInput = document.getElementById("auth-email");
     const passwordInput = document.getElementById("auth-password");
-    const email = emailInput ? emailInput.value.trim() : "";
+    const rawEmail = emailInput ? emailInput.value.trim() : "";
     const password = passwordInput ? passwordInput.value : "";
 
-    if(!email){
-      if(bannerText) bannerText.textContent = "Por favor, informe seu e-mail de acesso.";
+    if(!rawEmail){
+      if(bannerText) bannerText.textContent = "Por favor, informe seu e-mail ou usuário de acesso.";
       if(banner) banner.hidden = false;
+      return;
+    }
+
+    const lowerEmail = rawEmail.toLowerCase();
+
+    // Tratamento especial para o usuário admin (senha 123456)
+    if (lowerEmail === "admin" || lowerEmail === "admin@gertec.com") {
+      if (password !== "123456") {
+        if(bannerText) bannerText.textContent = "Senha incorreta para o usuário admin. A senha correta é 123456.";
+        if(banner) banner.hidden = false;
+        showToast("Senha incorreta para o usuário admin!");
+        return;
+      }
+
+      const adminUser = {
+        email: "admin",
+        displayName: "Administrador (admin)",
+        uid: "admin"
+      };
+
+      registerUserLogin(adminUser);
+
+      if (fbAuth && signInWithEmailAndPassword && createUserWithEmailAndPassword) {
+        try {
+          const res = await signInWithEmailAndPassword(fbAuth, "admin@gertec.com", "123456");
+          updateAuthUI(res.user);
+        } catch (e1) {
+          try {
+            const resCreate = await createUserWithEmailAndPassword(fbAuth, "admin@gertec.com", "123456");
+            updateAuthUI(resCreate.user);
+          } catch (e2) {
+            updateAuthUI(adminUser);
+          }
+        }
+      } else {
+        updateAuthUI(adminUser);
+      }
+
+      if(banner) banner.hidden = true;
+      showToast("Login como Administrador realizado com sucesso!");
       return;
     }
 
@@ -3002,28 +3054,29 @@ function wireAuthModal(){
     if(fbAuth && signInWithEmailAndPassword && createUserWithEmailAndPassword){
       try {
         if(isSignUpMode){
-          const res = await createUserWithEmailAndPassword(fbAuth, email, pass);
+          const res = await createUserWithEmailAndPassword(fbAuth, rawEmail, pass);
           updateAuthUI(res.user);
         } else {
           try {
-            const res = await signInWithEmailAndPassword(fbAuth, email, pass);
+            const res = await signInWithEmailAndPassword(fbAuth, rawEmail, pass);
             updateAuthUI(res.user);
           } catch(authErr) {
             try {
-              const resCreate = await createUserWithEmailAndPassword(fbAuth, email, pass);
+              const resCreate = await createUserWithEmailAndPassword(fbAuth, rawEmail, pass);
               updateAuthUI(resCreate.user);
             } catch(createErr) {
-              updateAuthUI({ email: email, displayName: email.split("@")[0] });
+              updateAuthUI({ email: rawEmail, displayName: rawEmail.split("@")[0] });
             }
           }
         }
       } catch(err) {
-        updateAuthUI({ email: email, displayName: email.split("@")[0] });
+        updateAuthUI({ email: rawEmail, displayName: rawEmail.split("@")[0] });
       }
     } else {
-      updateAuthUI({ email: email, displayName: email.split("@")[0] });
+      updateAuthUI({ email: rawEmail, displayName: rawEmail.split("@")[0] });
     }
 
+    if(banner) banner.hidden = true;
     showToast("Login realizado com sucesso!");
   }
 
