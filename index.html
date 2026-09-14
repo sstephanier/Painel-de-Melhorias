@@ -1539,7 +1539,6 @@ async function initFirebase() {
 
     if (fbDb) {
       subscribeFirestoreData();
-      clearAllFirestoreData();
       setLiveStatus(true);
     }
 
@@ -1933,12 +1932,12 @@ function saveLocalData(){
 async function syncLocalItemsToFirestore(){
   if(!fbDb || !addDoc || !setDoc || !collection || !doc) return;
 
-  // 1. Sincronizar processos locais (criados offline ou sem Firestore ativo no momento)
   const localProcs = (state.processos || []).filter(p => p && p.id && String(p.id).startsWith("local-"));
   for(const p of localProcs){
     try {
-      const { calc, id, ...cleanData } = p;
-      const docRef = await addDoc(collection(fbDb, "processos"), cleanData);
+      const { calc, id, ...rawClean } = p;
+      const cleanForFirestore = JSON.parse(JSON.stringify(rawClean));
+      const docRef = await addDoc(collection(fbDb, "processos"), cleanForFirestore);
       if(docRef && docRef.id){
         state.acomp.forEach(a => {
           if(a.processoId === id) a.processoId = docRef.id;
@@ -1950,12 +1949,12 @@ async function syncLocalItemsToFirestore(){
     }
   }
 
-  // 2. Sincronizar acompanhamentos locais
   const localAcomp = (state.acomp || []).filter(a => a && a.id && String(a.id).startsWith("local-"));
   for(const a of localAcomp){
     try {
-      const { id, ...cleanData } = a;
-      const docRef = await addDoc(collection(fbDb, "acompanhamentos"), cleanData);
+      const { id, ...rawClean } = a;
+      const cleanForFirestore = JSON.parse(JSON.stringify(rawClean));
+      const docRef = await addDoc(collection(fbDb, "acompanhamentos"), cleanForFirestore);
       if(docRef && docRef.id){
         a.id = docRef.id;
       }
@@ -1964,7 +1963,6 @@ async function syncLocalItemsToFirestore(){
     }
   }
 
-  // Remover sincronização de sementes antigas
   saveLocalData();
 }
 
@@ -2041,11 +2039,14 @@ async function saveProcesso(p){
   p.createdByDisplayName = p.createdByDisplayName || activeUserName;
   p.createdAt = p.createdAt || new Date().toLocaleString("pt-BR");
 
+  const { calc, id: _tempId, ...rawClean } = p;
+  const cleanForFirestore = JSON.parse(JSON.stringify(rawClean));
+
   let savedId = "local-"+Math.random().toString(36).slice(2,9);
   let savedOnServer = false;
   if(fbDb && addDoc && collection){
     try{ 
-      const docRef = await addDoc(collection(fbDb, "processos"), p);
+      const docRef = await addDoc(collection(fbDb, "processos"), cleanForFirestore);
       if(docRef && docRef.id) savedId = docRef.id;
       savedOnServer = true;
     }catch(e){
@@ -2061,16 +2062,13 @@ async function saveProcesso(p){
     state.processos.unshift(procCalculated);
   }
   
-  // Limpa filtros ativos de interface para exibir o processo recém-cadastrado
   state.filters = { frente:"", setor:"", status:"", author:"", search:"" };
   refreshFilterOptions();
-  
-  // Expande os detalhes do processo recém-cadastrado
   openDetailIds.add(savedId);
 
   saveLocalData();
   refreshFilterAuthorOptions();
-  showToast(savedOnServer ? "Processo salvo no servidor!" : "Processo salvo localmente!");
+  showToast(savedOnServer ? "Processo salvo no Firebase!" : "Processo salvo localmente!");
   render();
 }
 
@@ -2084,10 +2082,13 @@ async function updateProcesso(id, data){
     updatedBy: activeUserEmail,
     updatedAt: new Date().toLocaleString("pt-BR")
   };
+  const { calc, id: _id, ...rawClean } = body;
+  const cleanForFirestore = JSON.parse(JSON.stringify(rawClean));
+
   let savedOnServer = false;
   if(fbDb && setDoc && doc && !id.startsWith("local-")){
     try{ 
-      await setDoc(doc(fbDb, "processos", id), body, { merge:true }); 
+      await setDoc(doc(fbDb, "processos", id), cleanForFirestore, { merge:true }); 
       savedOnServer = true;
     }catch(e){
       console.warn("Erro ao atualizar no Firestore:", e);
@@ -2096,7 +2097,7 @@ async function updateProcesso(id, data){
   state.processos = state.processos.map(p=> p.id===id ? { ...body, id, calc: computeProcesso(body) } : p);
   saveLocalData();
   refreshFilterAuthorOptions();
-  showToast(savedOnServer ? "Processo atualizado no servidor!" : "Processo atualizado!");
+  showToast(savedOnServer ? "Processo atualizado no Firebase!" : "Processo atualizado!");
   render();
 }
 
@@ -2114,7 +2115,7 @@ async function deleteProcesso(id){
   openDetailIds.delete(id);
   saveLocalData();
   refreshFilterAuthorOptions();
-  showToast(removedOnServer ? "Processo removido no servidor!" : "Processo removido!");
+  showToast(removedOnServer ? "Processo removido no Firebase!" : "Processo removido!");
   render();
 }
 
@@ -2125,11 +2126,14 @@ async function saveTracking(row){
   row.createdByDisplayName = row.createdByDisplayName || activeUserName;
   row.createdAt = row.createdAt || new Date().toLocaleString("pt-BR");
 
+  const { id: _tempId, ...rawClean } = row;
+  const cleanForFirestore = JSON.parse(JSON.stringify(rawClean));
+
   let savedId = "local-"+Math.random().toString(36).slice(2,9);
   let savedOnServer = false;
   if(fbDb && addDoc && collection){
     try{ 
-      const docRef = await addDoc(collection(fbDb, "acompanhamentos"), row); 
+      const docRef = await addDoc(collection(fbDb, "acompanhamentos"), cleanForFirestore); 
       if(docRef && docRef.id) savedId = docRef.id;
       savedOnServer = true;
     }catch(e){
@@ -2144,12 +2148,11 @@ async function saveTracking(row){
     state.acomp.push(row);
   }
 
-  // Auto-expande detalhes do processo para mostrar a mensuração do mês registrado
   if(row.processoId) openDetailIds.add(row.processoId);
 
   saveLocalData();
   refreshFilterAuthorOptions();
-  showToast(savedOnServer ? "Acompanhamento registrado no servidor!" : "Acompanhamento registrado!");
+  showToast(savedOnServer ? "Acompanhamento registrado no Firebase!" : "Acompanhamento registrado!");
   render();
 }
 
